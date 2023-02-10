@@ -5,8 +5,7 @@
 $ sudo nano /boot/config.txt
 
 # Add i2c port & bus at last line
-dtoverlay=i2c-gpio,i2c_gpio_sda=31,i2c_gpio_scl=30,bus=4 #SX1509 Port
-dtoverlay=i2c-gpio,i2c_gpio_sda=38,i2c_gpio_scl=16,bus=3 #LCD Port
+dtoverlay=i2c-gpio,i2c_gpio_sda=17,i2c_gpio_scl=19,bus=2 #SX1509 Port
 ```
 
 ## 2. Install requirements
