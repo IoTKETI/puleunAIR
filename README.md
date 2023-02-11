@@ -20,35 +20,28 @@ $ sudo apt-get update
 $ sudo apt-get install mosquitto
 ```
 ### Python Library
-#### adafruit-blinka
-```
-$ pip3 install adafruit-blinka
-```
 #### mqtt
-```
+```shell
 $ pip3 install paho-mqtt
 ```
-#### LCD
+#### DHT11
+```shell
+$ pip3 install adafruit-blinka
+$ pip3 install adafruit-circuitypython-dht
 ```
-$ pip3 install adafruit-circuitpython-charlcd
- ```
-#### Temperature - MAX6675.py
+- edit DHT library file in dist-package
+```shell
+$ sudo nano /usr/local/lib/python3.7/dist-packages/Adafruit_DHT/platform_detect.py
 ```
-$ git clone https://github.com/tdack/MAX6675.git
-$ sudo apt-get update
-$ sudo apt-get install build-essential python-dev python-smbus
-$ sudo python3 MAX6675/setup.py install 
-$ sudo cp MAX6675/MAX6675/MAX6675.py /home/pi/nCube-sparrow-dry/
-```
-#### Load Cell - hx711.py
-```
-$ git clone https://github.com/tatobari/hx711py
-$ sudo cp hx711py/hx711.py /home/pi/nCube-sparrow-dry/
+- Add code in line 111
+```shell
+elif match.group(1) == 'BCM2711':
+    return 3
 ```
   
 ## 3. Install dependencies
-```
-$ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+```shell
+$ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 
 $ sudo apt-get install -y nodejs
 
@@ -56,18 +49,9 @@ $ node -v
 
 $ sudo npm install -g pm2
 
-$ git clone https://github.com/IoTKETI/nCube-sparrow-dry-100
+$ git clone https://github.com/IoTKETI/puleunAIR.git
 
-$ cd /home/pi/nCube-sparrow-dry-100
+$ cd /home/pi/puleunAIR
 
 $ npm install
-```
-
-## 4. Auto Start
-```
-$ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
-```
-```
-# Add start command
-sh /home/pi/nCube-sparrow-dry-100/auto-food.sh
 ```

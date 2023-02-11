@@ -1,0 +1,24 @@
+{
+    "name": "puleunAIR",
+    "version": "1.0.0",
+    "description": "",
+    "main": "terminal_app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "mqtt": "^3.0.0",
+        "nanoid": "^3.1.30",
+        "terminal-kit": "^1.42.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/IoTKETI/puleunAIR.git"
+    },
+    "author": "Wonseok Jung, Autonomous IoT Research Center, KETI",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/IoTKETI/puleunAIR/issues"
+    },
+    "homepage": "https://github.com/IoTKETI/puleunAIR#readme"
+}
