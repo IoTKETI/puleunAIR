@@ -22,7 +22,7 @@ let humidity = 0.0;
 
 local_mqtt_connect('127.0.0.1');
 
-let startmenu_list = ['Quit', 'Control_1', 'Control_2', 'Control_3', 'Control_4', 'Control_5', 'All'];
+let control_items = ['Control_1', 'Control_2', 'Control_3', 'Control_4', 'Control_5'];
 
 function local_mqtt_connect(serverip) {
     if (local_mqtt_client === null) {
@@ -92,8 +92,28 @@ setInterval(req_watertemp, 1000);
 setInterval(req_humidity, 1000);
 
 function set_control(point, val) {
-    if (local_mqtt_client !== null) {
-        local_mqtt_client.publish(eval('set_Control_' + point + '_topic'))
+    if (point === 1) {
+        if (local_mqtt_client !== null) {
+            local_mqtt_client.publish(set_Control_1_topic, val);
+        }
+    } else if (point === 2) {
+        if (local_mqtt_client !== null) {
+            local_mqtt_client.publish(set_Control_2_topic, val);
+        }
+    } else if (point === 3) {
+        if (local_mqtt_client !== null) {
+            local_mqtt_client.publish(set_Control_3_topic, val);
+        }
+    } else if (point === 4) {
+        if (local_mqtt_client !== null) {
+            local_mqtt_client.publish(set_Control_4_topic, val);
+        }
+    } else if (point === 5) {
+        if (local_mqtt_client !== null) {
+            local_mqtt_client.publish(set_Control_5_topic, val);
+        }
+    } else {
+        console.log('invalid point');
     }
 }
 
@@ -104,6 +124,7 @@ let cur_mode_selected = 'none';
 let cur_drone_list_selected = [];
 let cur_command_items = [];
 let command_items = ['Back', 'ON', 'OFF'];
+let startmenu_list = control_items;
 
 function startMenu() {
     let _options = {
@@ -112,6 +133,9 @@ function startMenu() {
         selectedStyle: term.dim.yellow.bgGray,
         selectedIndex: startMenuIndex
     };
+
+    startmenu_list.unshift('Quit');
+    startmenu_list.push('All');
 
     term.singleLineMenu(startmenu_list, _options, function (error, response) {
         term('\n').eraseLineAfter.moveTo.green(1, 2,
@@ -130,14 +154,14 @@ function startMenu() {
         cur_command_items = [].concat(command_items);
 
         if (startMenuDroneSelected === 'All') {
-            cur_drone_list_selected = [].concat(conf.drone);
+            cur_drone_list_selected = [].concat(control_items);
 
             cur_command_items.splice(cur_command_items.indexOf('Follow'), 1);
             //cur_command_items.splice(cur_command_items.indexOf('Real_Control'), 1);
         } else if (startMenuDroneSelected === 'Quit') {
             process.exit();
         } else {
-            cur_drone_list_selected = [].concat(conf.drone[startMenuIndex - 1]);
+            cur_drone_list_selected = [].concat(control_items[startMenuIndex - 1]);
         }
         //
         // term('\n').eraseDisplayBelow();
@@ -146,4 +170,4 @@ function startMenu() {
     });
 }
 
-// setTimeout(startMenu, 1000);
+setTimeout(startMenu, 1000);
