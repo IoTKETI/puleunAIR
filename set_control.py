@@ -4,7 +4,7 @@
 """
 
 import paho.mqtt.client as mqtt
-# import SX1509
+import SX1509
 import Control
 import time
 
