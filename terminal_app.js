@@ -174,7 +174,7 @@ function allOnMenu() {
             if (control_selected.includes('Control')) {
                 if (local_mqtt_client !== null) {
                     local_mqtt_client.publish('/puleunair/' + control_selected + '/set', '1', () => {
-                        console.log('Send ON command to ' + control_selected);
+                        // console.log('Send ON command to ' + control_selected);
                     });
                 }
             }
@@ -195,7 +195,7 @@ function allOffMenu() {
             if (control_selected.includes('Control')) {
                 if (local_mqtt_client !== null) {
                     local_mqtt_client.publish('/puleunair/' + control_selected + '/set', '0', () => {
-                        console.log('Send OFF command to ' + control_selected);
+                        // console.log('Send OFF command to ' + control_selected);
                     });
                 }
             }
