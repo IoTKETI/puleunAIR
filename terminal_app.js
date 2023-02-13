@@ -4,17 +4,11 @@
 
 const mqtt = require('mqtt');
 const {nanoid} = require('nanoid');
-const fs = require("fs");
 const term = require('terminal-kit').terminal;
 
 let local_mqtt_client = null;
 const sub_watertemp_topic = '/puleunair/hotwater';
 const sub_humidity_topic = '/puleunair/humidity';
-const set_Control_1_topic = '/puleunair/Control1/set';
-const set_Control_2_topic = '/puleunair/Control2/set';
-const set_Control_3_topic = '/puleunair/Control3/set';
-const set_Control_4_topic = '/puleunair/Control4/set';
-const set_Control_5_topic = '/puleunair/Control5/set';
 
 let hotwater_temp = 0.0;
 let humidity = 0.0;
@@ -129,7 +123,7 @@ function allMenu() {
     placeFlag = 'allMenu';
     printFlag = 'enable';
 
-    var _options = {
+    let _options = {
         y: 1,	// the menu will be on the top of the terminal
         style: term.inverse,
         selectedStyle: term.dim.blue.bgGreen,
@@ -164,8 +158,6 @@ function allMenu() {
         }
     });
 }
-
-let column_count = 0;
 
 function allOnMenu() {
     term.eraseDisplayBelow();
@@ -205,7 +197,6 @@ function allOffMenu() {
             }
         }
     }
-
     setTimeout(allMenu, back_menu_delay * (cur_control_list_selected.length + 1));
 }
 
