@@ -111,7 +111,7 @@ function startMenu() {
         } else if (startMenuDroneSelected === 'Quit') {
             process.exit();
         } else {
-            cur_control_list_selected = [].concat(control_items[startMenuIndex - 1]);
+            cur_control_list_selected = [].concat(control_items[startMenuIndex]);
         }
 
         term('\n').eraseDisplayBelow();
@@ -150,7 +150,7 @@ function allMenu() {
         if (startMenuDroneSelected === 'All') {
             cur_control_list_selected = [].concat(control_items);
         } else {
-            cur_control_list_selected = [].concat(control_items[startMenuIndex - 1]);
+            cur_control_list_selected = [].concat(control_items[startMenuIndex]);
         }
 
         if (response.selectedText === 'Back') {
@@ -174,7 +174,7 @@ function allOnMenu() {
     for (let idx in cur_control_list_selected) {
         if (cur_control_list_selected.hasOwnProperty(idx)) {
             let control_selected = cur_control_list_selected[idx];
-
+            console.log(control_selected)
             if (control_selected.includes('Control')) {
                 if (local_mqtt_client !== null) {
                     local_mqtt_client.publish('/puleunair/' + control_selected + '/set', '1', () => {
