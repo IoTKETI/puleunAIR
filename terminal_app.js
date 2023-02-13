@@ -9,13 +9,16 @@ const term = require('terminal-kit').terminal;
 let local_mqtt_client = null;
 const sub_watertemp_topic = '/puleunair/hotwater';
 const sub_humidity_topic = '/puleunair/humidity';
+const sub_temperature_topic = '/puleunair/temperature';
 
 let hotwater_temp = 0.0;
 let humidity = 0.0;
+let temperature = 0.0;
 
 local_mqtt_connect('127.0.0.1');
 
-const control_items = ['Quit', 'Control_1', 'Control_2', 'Control_3', 'Control_4', 'Control_5', 'All'];
+const control_items = ['Quit', 'Control_1', 'Control_2', 'Control_3', 'Control_4', 'Control_5', 'All', 'AUTO'];
+const auto_items = ['Back', 'Heater', 'Air', 'Pump', 'Fan', 'Spray'];
 
 function local_mqtt_connect(serverip) {
     if (local_mqtt_client === null) {
@@ -47,7 +50,11 @@ function local_mqtt_connect(serverip) {
                 local_mqtt_client.subscribe(sub_humidity_topic);
                 console.log('[local_mqtt] sub_humidity_topic is subscribed: ' + sub_humidity_topic);
             }
-        });
+            if (sub_temperature_topic !== '') {
+                local_mqtt_client.subscribe(sub_temperature_topic);
+                console.log('[local_mqtt] sub_temperature_topic is subscribed: ' + sub_temperature_topic);
+            }
+     });
 
         local_mqtt_client.on('message', function (topic, message) {
             if (topic === sub_watertemp_topic) {
@@ -55,11 +62,16 @@ function local_mqtt_connect(serverip) {
                 hotwater_temp = message.toString();
             }
 
-            if (topic === sub_humidity_topic) {
+            else if (topic === sub_humidity_topic) {
                 // console.log('sub_humidity_topic - ', message.toString());
                 humidity = message.toString();
             }
-        });
+            
+            else if (topic === sub_temperature_topic) {
+                // console.log('sub_temperature_topic - ', message.toString());
+                temperature = message.toString();
+            }
+    });
 
         local_mqtt_client.on('error', function (err) {
             console.log('[local_mqtt] (error) ' + err.message);
@@ -98,30 +110,178 @@ function startMenu() {
 
         // console.log(response);
 
-        cur_command_items = [].concat(command_items);
-
-        if (startMenuDroneSelected === 'All') {
-            cur_control_list_selected = [].concat(control_items);
-        } else if (startMenuDroneSelected === 'Quit') {
+        
+        if (startMenuDroneSelected === 'Quit') {
             process.exit();
-        } else {
-            cur_control_list_selected = [].concat(control_items[startMenuIndex]);
         }
+        else if (startMenuDroneSelected === 'AUTO') {
+            cur_command_items = [].concat(auto_items);
+            
+            term('\n').eraseDisplayBelow();
+            
+            elapsed_count = 0;
+            spray_count = 0;
+            air_count = 0;
 
-        term('\n').eraseDisplayBelow();
+            autoMenu();
+        }
+        else {
+            cur_command_items = [].concat(command_items);
+            
+            if (startMenuDroneSelected === 'All') {
+                cur_control_list_selected = [].concat(control_items);
+            } 
+            else {
+                cur_control_list_selected = [].concat(control_items[startMenuIndex]);
+            }
+            
+            term('\n').eraseDisplayBelow();
 
-        allMenu();
+            allMenu();
+        }
     });
 }
 
+let elapsed_count = 0;
+let spray_period = 10; // minutes
+let spray_count = 0;
+let air_period = 10; // minutes
+let air_count = 0;
+
+
 setInterval(() => {
+    elapsed_count++;
+    
+    term.moveTo.green(1, 2, "                                                                                    ");
+    term.moveTo.green(1, 3, "                                                                                    ");
+    term.moveTo.green(1, 4, "                                                                                    ");
+    term.moveTo.green(1, 5, "                                                                                    ");
+    term.moveTo.green(1, 6, "                                                                                    ");
+    term.moveTo.green(1, 7, "                                                                                    ");
+    term.moveTo.green(1, 8, "                                                                                    ");
+    term.moveTo.green(1, 9, "                                                                                    ");
+    term.moveTo.green(1, 10, "                                                                                    ");
+    term.moveTo.green(1, 11, "                                                                                    ");
+    term.moveTo.green(1, 12, "                                                                                    ");
+
+    term.moveTo.green(1, 3, " Temperature - %s*C", temperature);
     term.moveTo.green(1, 4, " Humidity - %s\%", humidity);
-    term.moveTo.green(1, 5, " Hotwater Temperature - %s*C", hotwater_temp);
-})
+    term.moveTo.green(1, 5, " Hotwater Temperature - %s*C\n", hotwater_temp);
+    
+    if(placeFlag === 'autoMenu') {
+        term.moveTo.green(1, 7, " AUTO MODE\n");
+        term.moveTo.green(1, 8, " SPRAY: %d minutes per hour\n", spray_period);
+        term.moveTo.green(1, 9, "   AIR: %d minutes per hour\n", air_period);
+        
+        spray_count++;
+        /* if (0 <= spray_count && spray_count < (spray_period * 60)) {
+            local_mqtt_client.publish('/puleunair/Control_5/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else if ((spray_period * 60) <= spray_count && spray_count < (60 * 60)) {
+            local_mqtt_client.publish('/puleunair/Control_5/set', '0', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else {
+            spray_count = 0;
+        }*/
+        if (0 <= spray_count && spray_count < (spray_period)) {
+            local_mqtt_client.publish('/puleunair/Control_5/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else if ((spray_period) <= spray_count && spray_count < (60)) {
+            local_mqtt_client.publish('/puleunair/Control_5/set', '0', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else {
+            spray_count = 0;
+        }
+
+        
+        air_count++;
+        /*if (0 <= air_count && air_count < (air_period * 60)) {
+            local_mqtt_client.publish('/puleunair/Control_2/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else if ((air_period * 60) <= air_count && air_count < (60 * 60)) {
+            local_mqtt_client.publish('/puleunair/Control_2/set', '0', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else {
+            air_count = 0;
+        }*/
+        if (0 <= air_count && air_count < (air_period)) {
+            local_mqtt_client.publish('/puleunair/Control_2/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else if ((air_period) <= air_count && air_count < (60)) {
+            local_mqtt_client.publish('/puleunair/Control_2/set', '0', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else {
+            air_count = 0;
+        }
+    }
+    
+    
+}, 1000);
+
 let placeFlag = '';
 let printFlag = '';
 let curAllMenuIndex = 0;
 const back_menu_delay = 100;
+
+function autoMenu() {
+    placeFlag = 'autoMenu';
+    printFlag = 'enable';
+
+    let _options = {
+        y: 1,	// the menu will be on the top of the terminal
+        style: term.inverse,
+        selectedStyle: term.dim.blue.bgGreen,
+        selectedIndex: curAllMenuIndex
+    };
+
+    term.singleLineMenu(cur_command_items, _options, function (error, response) {
+        term('\n').eraseLineAfter.moveTo.green(1, 2,
+            "#%s selected: %s (%s,%s)\n",
+            response.selectedIndex,
+            response.selectedText,
+            response.x,
+            response.y
+        );
+
+        curAllMenuIndex = response.selectedIndex;
+
+        if (startMenuDroneSelected === 'All') {
+            cur_control_list_selected = [].concat(control_items);
+        } 
+        else {
+            cur_control_list_selected = [].concat(control_items[startMenuIndex]);
+        }
+
+        if (response.selectedText === 'Back') {
+            setTimeout(startMenu, back_menu_delay);
+        } 
+        else if (response.selectedText === 'HeaterON') {
+            allOnMenu();
+        } 
+        else if (response.selectedText === 'OFF') {
+            allOffMenu();
+        } 
+        else {
+            setTimeout(startMenu, back_menu_delay);
+        }
+    });
+}
 
 function allMenu() {
     placeFlag = 'allMenu';
@@ -147,17 +307,21 @@ function allMenu() {
 
         if (startMenuDroneSelected === 'All') {
             cur_control_list_selected = [].concat(control_items);
-        } else {
+        } 
+        else {
             cur_control_list_selected = [].concat(control_items[startMenuIndex]);
         }
 
         if (response.selectedText === 'Back') {
             setTimeout(startMenu, back_menu_delay);
-        } else if (response.selectedText === 'ON') {
+        } 
+        else if (response.selectedText === 'ON') {
             allOnMenu();
-        } else if (response.selectedText === 'OFF') {
+        } 
+        else if (response.selectedText === 'OFF') {
             allOffMenu();
-        } else {
+        } 
+        else {
             setTimeout(startMenu, back_menu_delay);
         }
     });

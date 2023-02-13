@@ -49,6 +49,7 @@ def get_temphumi(out_pin):
         if h is not None and t is not None:
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(t, h))
             if local_mqtt_client is not None:
+                local_mqtt_client.publish('/puleunair/temperature', t)
                 local_mqtt_client.publish('/puleunair/humidity', h)
             else:
                 local_mqtt_client.reconnect()
