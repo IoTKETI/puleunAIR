@@ -114,6 +114,10 @@ function startMenu() {
     });
 }
 
+setInterval(() => {
+    term.moveTo.green(1, 4, "습도 - %s\%", humidity);
+    term.moveTo.green(1, 5, "온수온도 - %s*C", hotwater_temp);
+})
 let placeFlag = '';
 let printFlag = '';
 let curAllMenuIndex = 0;
