@@ -37,27 +37,27 @@ ctl = Control.Control(sx)
 
 
 def set_Control1(val):
-    # ctl.DOUT(Control1_pin, val)
+    ctl.DOUT(Control1_pin, val)
     print("Control Control1 - ", val)
 
 
 def set_Control2(val):
-    # ctl.DOUT(Control2_pin, val)
+    ctl.DOUT(Control2_pin, val)
     print("Control Control2 - ", val)
 
 
 def set_Control3(val):
-    # ctl.DOUT(Control3_pin, val)
+    ctl.DOUT(Control3_pin, val)
     print("Control Control3 - ", val)
 
 
 def set_Control4(val):
-    # ctl.DOUT(Control4_pin, val)
+    ctl.DOUT(Control4_pin, val)
     print("Control Control4 - ", val)
 
 
 def set_Control5(val):
-    # ctl.DOUT(Control5_pin, val)
+    ctl.DOUT(Control5_pin, val)
     print("Control Control5 - ", val)
 
 
@@ -74,11 +74,11 @@ def on_connect(client, userdata, flags, rc):
 
     if rc is 0:
         print('[local_mqtt_client_connect] connect to 127.0.0.1')
-        local_mqtt_client.subscribe("/puleunair/Control1/set")
-        local_mqtt_client.subscribe("/puleunair/Control2/set")
-        local_mqtt_client.subscribe("/puleunair/Control3/set")
-        local_mqtt_client.subscribe("/puleunair/Control4/set")
-        local_mqtt_client.subscribe("/puleunair/Control5/set")
+        local_mqtt_client.subscribe("/puleunair/Control_1/set")
+        local_mqtt_client.subscribe("/puleunair/Control_2/set")
+        local_mqtt_client.subscribe("/puleunair/Control_3/set")
+        local_mqtt_client.subscribe("/puleunair/Control_4/set")
+        local_mqtt_client.subscribe("/puleunair/Control_5/set")
     elif rc is 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
@@ -120,19 +120,19 @@ def on_message(client, userdata, _msg):
     global Control4_val
     global Control5_val
 
-    if _msg.topic == '/puleunair/Control1/set':
+    if _msg.topic == '/puleunair/Control_1/set':
         Control1_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control1
-    elif _msg.topic == '/puleunair/Control2/set':
+    elif _msg.topic == '/puleunair/Control_2/set':
         Control2_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control2
-    elif _msg.topic == '/puleunair/Control3/set':
+    elif _msg.topic == '/puleunair/Control_3/set':
         Control3_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control3
-    elif _msg.topic == '/puleunair/Control4/set':
+    elif _msg.topic == '/puleunair/Control_4/set':
         Control4_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control4
-    elif _msg.topic == '/puleunair/Control5/set':
+    elif _msg.topic == '/puleunair/Control_5/set':
         Control5_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control5
     else:
