@@ -31,7 +31,7 @@ Control4_pin = 13
 Control5_pin = 14
 
 i2c_addr = 0x3e
-i2c_bus = 4
+i2c_bus = 2
 sx = SX1509.SX1509(i2c_addr, i2c_bus)
 ctl = Control.Control(sx)
 

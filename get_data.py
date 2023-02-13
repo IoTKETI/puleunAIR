@@ -26,15 +26,14 @@ def get_hotwater(cs, sck, so):
     max6675.set_pin(cs, sck, so, 1)
 
     try:
-        while True:
-            temp = max6675.read_temp(cs)
-            temp = round(temp, 1)
-            print("Hot Water Temperature = {0:0.1f}*C".format(temp))
-            if local_mqtt_client is not None:
-                local_mqtt_client.publish('/puleunair/hotwater', temp)
-            else:
-                local_mqtt_client.reconnect()
-            max6675.time.sleep(2)
+        temp = max6675.read_temp(cs)
+        temp = round(temp, 1)
+        print("Hot Water Temperature = {0:0.1f}*C".format(temp))
+        if local_mqtt_client is not None:
+            local_mqtt_client.publish('/puleunair/hotwater', temp)
+        else:
+            local_mqtt_client.reconnect()
+        max6675.time.sleep(2)
 
     except KeyboardInterrupt:
         pass
@@ -45,22 +44,19 @@ def get_temphumi(out_pin):
 
     sensor = dht.DHT11
     try:
-        while True:
-            h, t = dht.read_retry(sensor, out_pin)
+        h, t = dht.read_retry(sensor, out_pin)
 
-            if h is not None and t is not None:
-                print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(t, h))
-                if local_mqtt_client is not None:
-                    local_mqtt_client.publish('/puleunair/humidity', h)
-                else:
-                    local_mqtt_client.reconnect()
+        if h is not None and t is not None:
+            print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(t, h))
+            if local_mqtt_client is not None:
+                local_mqtt_client.publish('/puleunair/humidity', h)
             else:
-                print("Read error")
-                time.sleep(100)
+                local_mqtt_client.reconnect()
+        else:
+            print("Read error")
+            time.sleep(100)
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
-    finally:
-        print("END")
 
 
 def on_connect(client, userdata, flags, rc):
