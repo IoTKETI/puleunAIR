@@ -90,6 +90,8 @@ let command_items = ['Back', 'ON', 'OFF'];
 let startmenu_list = control_items;
 
 function startMenu() {
+    placeFlag = 'startMenu';
+    
     let _options = {
         y: 1,	// the menu will be on the top of the terminal
         style: term.inverse,
