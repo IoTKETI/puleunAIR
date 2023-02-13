@@ -12,23 +12,23 @@ local_mqtt_client = None
 
 g_set_event = 0x00
 
-SET_TPR = 0x01
-SET_Heater = 0x02
-SET_Stirrer = 0x04
-SET_Lift = 0x08
-SET_Lift2 = 0x10
+SET_Control1 = 0x01
+SET_Control2 = 0x02
+SET_Control3 = 0x04
+SET_Control4 = 0x08
+SET_Control5 = 0x10
 
-TPR_val = 0
-Heater_val = 0
-Stirrer_val = 0
-Lift_val = 0
-Lift2_val = 0
+Control1_val = 0
+Control2_val = 0
+Control3_val = 0
+Control4_val = 0
+Control5_val = 0
 
-TPR_pin = 10
-Heater_pin = 11
-Stirrer_pin = 12
-Lift_pin = 13
-Lift2_pin = 14
+Control1_pin = 10
+Control2_pin = 11
+Control3_pin = 12
+Control4_pin = 13
+Control5_pin = 14
 
 i2c_addr = 0x3e
 i2c_bus = 4
@@ -36,29 +36,29 @@ sx = SX1509.SX1509(i2c_addr, i2c_bus)
 ctl = Control.Control(sx)
 
 
-def set_TPR(val):
-    # ctl.DOUT(TPR_pin, val)
-    print("Control TPR - ", val)
+def set_Control1(val):
+    # ctl.DOUT(Control1_pin, val)
+    print("Control Control1 - ", val)
 
 
-def set_Heater(val):
-    # ctl.DOUT(Heater_pin, val)
-    print("Control Heater - ", val)
+def set_Control2(val):
+    # ctl.DOUT(Control2_pin, val)
+    print("Control Control2 - ", val)
 
 
-def set_Stirrer(val):
-    # ctl.DOUT(Stirrer_pin, val)
-    print("Control Stirrer - ", val)
+def set_Control3(val):
+    # ctl.DOUT(Control3_pin, val)
+    print("Control Control3 - ", val)
 
 
-def set_Lift(val):
-    # ctl.DOUT(Lift_pin, val)
-    print("Control Lift - ", val)
+def set_Control4(val):
+    # ctl.DOUT(Control4_pin, val)
+    print("Control Control4 - ", val)
 
 
-def set_Lift2(val):
-    # ctl.DOUT(Lift2_pin, val)
-    print("Control Lift2 - ", val)
+def set_Control5(val):
+    # ctl.DOUT(Control5_pin, val)
+    print("Control Control5 - ", val)
 
 
 def on_connect(client, userdata, flags, rc):
@@ -74,11 +74,11 @@ def on_connect(client, userdata, flags, rc):
 
     if rc is 0:
         print('[local_mqtt_client_connect] connect to 127.0.0.1')
-        local_mqtt_client.subscribe("/puleunair/TPR/set")
-        local_mqtt_client.subscribe("/puleunair/Heater/set")
-        local_mqtt_client.subscribe("/puleunair/Stirrer/set")
-        local_mqtt_client.subscribe("/puleunair/Lift/set")
-        local_mqtt_client.subscribe("/puleunair/Lift2/set")
+        local_mqtt_client.subscribe("/puleunair/Control1/set")
+        local_mqtt_client.subscribe("/puleunair/Control2/set")
+        local_mqtt_client.subscribe("/puleunair/Control3/set")
+        local_mqtt_client.subscribe("/puleunair/Control4/set")
+        local_mqtt_client.subscribe("/puleunair/Control5/set")
     elif rc is 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
@@ -109,32 +109,32 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, _msg):
     global g_set_event
-    global SET_TPR
-    global SET_Heater
-    global SET_Stirrer
-    global SET_Lift
-    global SET_Lift2
-    global TPR_val
-    global Heater_val
-    global Stirrer_val
-    global Lift_val
-    global Lift2_val
+    global SET_Control1
+    global SET_Control2
+    global SET_Control3
+    global SET_Control4
+    global SET_Control5
+    global Control1_val
+    global Control2_val
+    global Control3_val
+    global Control4_val
+    global Control5_val
 
-    if _msg.topic == '/puleunair/TPR/set':
-        TPR_val = _msg.payload.decode('utf-8')
-        g_set_event |= SET_TPR
-    elif _msg.topic == '/puleunair/Heater/set':
-        Heater_val = _msg.payload.decode('utf-8')
-        g_set_event |= SET_Heater
-    elif _msg.topic == '/puleunair/Stirrer/set':
-        Stirrer_val = _msg.payload.decode('utf-8')
-        g_set_event |= SET_Stirrer
-    elif _msg.topic == '/puleunair/Lift/set':
-        Lift_val = _msg.payload.decode('utf-8')
-        g_set_event |= SET_Lift
-    elif _msg.topic == '/puleunair/Lift2/set':
-        Lift2_val = _msg.payload.decode('utf-8')
-        g_set_event |= SET_Lift2
+    if _msg.topic == '/puleunair/Control1/set':
+        Control1_val = int(_msg.payload.decode('utf-8'))
+        g_set_event |= SET_Control1
+    elif _msg.topic == '/puleunair/Control2/set':
+        Control2_val = int(_msg.payload.decode('utf-8'))
+        g_set_event |= SET_Control2
+    elif _msg.topic == '/puleunair/Control3/set':
+        Control3_val = int(_msg.payload.decode('utf-8'))
+        g_set_event |= SET_Control3
+    elif _msg.topic == '/puleunair/Control4/set':
+        Control4_val = int(_msg.payload.decode('utf-8'))
+        g_set_event |= SET_Control4
+    elif _msg.topic == '/puleunair/Control5/set':
+        Control5_val = int(_msg.payload.decode('utf-8'))
+        g_set_event |= SET_Control5
     else:
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
@@ -150,31 +150,31 @@ if __name__ == "__main__":
     local_mqtt_client.loop_start()
 
     while True:
-        if g_set_event & SET_TPR:
-            g_set_event &= (~SET_TPR)
-            set_TPR(TPR_val)
-        elif g_set_event & SET_Heater:
-            g_set_event &= (~SET_Heater)
-            set_Heater(Heater_val)
-        elif g_set_event & SET_Stirrer:
-            g_set_event &= (~SET_Stirrer)
-            set_Stirrer(Stirrer_val)
-        elif g_set_event & SET_Lift:
-            g_set_event &= (~SET_Lift)
-            set_Lift(Lift_val)
-        elif g_set_event & SET_Lift2:
-            g_set_event &= (~SET_Lift2)
-            set_Lift2(Lift2_val)
+        if g_set_event & SET_Control1:
+            g_set_event &= (~SET_Control1)
+            set_Control1(Control1_val)
+        elif g_set_event & SET_Control2:
+            g_set_event &= (~SET_Control2)
+            set_Control2(Control2_val)
+        elif g_set_event & SET_Control3:
+            g_set_event &= (~SET_Control3)
+            set_Control3(Control3_val)
+        elif g_set_event & SET_Control4:
+            g_set_event &= (~SET_Control4)
+            set_Control4(Control4_val)
+        elif g_set_event & SET_Control5:
+            g_set_event &= (~SET_Control5)
+            set_Control5(Control5_val)
 #
 # count = 0
 #
 # while True:
 #     count += 1
 #     count %= 2
-#     ctl.DOUT(TPR_pin, count)
-#     ctl.DOUT(Heater_pin, count)
-#     ctl.DOUT(Stirrer_pin, count)
-#     ctl.DOUT(Lift_pin, count)
-#     ctl.DOUT(Lift2_pin, count)
+#     ctl.DOUT(Control1_pin, count)
+#     ctl.DOUT(Control2_pin, count)
+#     ctl.DOUT(Control3_pin, count)
+#     ctl.DOUT(Control4_pin, count)
+#     ctl.DOUT(Control5_pin, count)
 #     print(count)
 #     time.sleep(1)
