@@ -7,10 +7,8 @@ const {nanoid} = require('nanoid');
 const term = require('terminal-kit').terminal;
 
 let local_mqtt_client = null;
-const sub_watertemp_topic = '/puleunair/hotwater/res';
-const sub_humidity_topic = '/puleunair/humi/res';
-const pub_watertemp_topic = '/puleunair/hotwater/req';
-const pub_humidity_topic = '/puleunair/humi/req';
+const sub_watertemp_topic = '/puleunair/hotwater';
+const sub_humidity_topic = '/puleunair/humidity';
 const set_Control_1_topic = '/puleunair/Control1/set';
 const set_Control_2_topic = '/puleunair/Control2/set';
 const set_Control_3_topic = '/puleunair/Control3/set';
@@ -75,21 +73,6 @@ function local_mqtt_connect(serverip) {
         });
     }
 }
-
-function req_watertemp() {
-    if (local_mqtt_client !== null) {
-        local_mqtt_client.publish(pub_watertemp_topic, 'req');
-    }
-}
-
-function req_humidity() {
-    if (local_mqtt_client !== null) {
-        local_mqtt_client.publish(pub_humidity_topic, 'req');
-    }
-}
-
-setInterval(req_watertemp, 1000);
-setInterval(req_humidity, 1000);
 
 function set_control(point, val) {
     if (point === 1) {

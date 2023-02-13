@@ -30,9 +30,10 @@ Stirrer_pin = 12
 Lift_pin = 13
 Lift2_pin = 14
 
-addr = 0x3e
-# sx = SX1509.SX1509(addr)
-# ctl = Control.Control(sx)
+i2c_addr = 0x3e
+i2c_bus = 4
+sx = SX1509.SX1509(i2c_addr, i2c_bus)
+ctl = Control.Control(sx)
 
 
 def set_TPR(val):

@@ -137,10 +137,10 @@ class SX1509:
         RegOff12, RegOff13, RegOff14, RegOff15
     ]
 
-    def __init__(self, i2c_addr):
+    def __init__(self, i2c_addr, i2c_bus):
         self.i2c_addr = i2c_addr
         import smbus
-        self.bus = smbus.SMBus(2)  
+        self.bus = smbus.SMBus(i2c_bus)
 
     def write(self, register, data):
         self.bus.write_byte_data(self.i2c_addr, register, data)
