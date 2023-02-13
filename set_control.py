@@ -8,7 +8,7 @@ import paho.mqtt.client as mqtt
 import Control
 import time
 
-global local_mqtt_client
+local_mqtt_client = None
 
 g_set_event = 0x00
 
@@ -68,6 +68,9 @@ def on_connect(client, userdata, flags, rc):
     # 4: Connection refused - bad username or password
     # 5: Connection refused - not authorised
     # 6-255: Currently unused.
+
+    global local_mqtt_client
+
     if rc is 0:
         print('[local_mqtt_client_connect] connect to 127.0.0.1')
         local_mqtt_client.subscribe("/puleunair/TPR/set")

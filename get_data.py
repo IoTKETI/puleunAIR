@@ -8,14 +8,9 @@ import max6675
 import Adafruit_DHT as dht
 import time
 
-global local_mqtt_client
+local_mqtt_client = None
 pub_hotwater_topic = "/puleunair/hotwater/res"
 pub_humi_topic = "/puleunair/humi/res"
-
-g_res_event = 0x00
-
-RES_HOTWATER = 0x01
-RES_TEMPHUMI = 0x02
 
 # MAX6675
 cs = 18
@@ -26,6 +21,8 @@ pin = 11
 
 
 def get_hotwater(cs, sck, so):
+    global local_mqtt_client
+
     max6675.set_pin(cs, sck, so, 1)
 
     try:
@@ -33,16 +30,19 @@ def get_hotwater(cs, sck, so):
             temp = max6675.read_temp(cs)
             temp = round(temp, 1)
             print("Hot Water Temperature = {0:0.1f}*C".format(temp))
-
+            if local_mqtt_client is not None:
+                local_mqtt_client.publish('/puleunair/hotwater', temp)
+            else:
+                local_mqtt_client.reconnect()
             max6675.time.sleep(2)
 
     except KeyboardInterrupt:
         pass
 
-    return temp
-
 
 def get_temphumi(out_pin):
+    global local_mqtt_client
+
     sensor = dht.DHT11
     try:
         while True:
@@ -50,6 +50,10 @@ def get_temphumi(out_pin):
 
             if h is not None and t is not None:
                 print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(t, h))
+                if local_mqtt_client is not None:
+                    local_mqtt_client.publish('/puleunair/humidity', h)
+                else:
+                    local_mqtt_client.reconnect()
             else:
                 print("Read error")
                 time.sleep(100)
@@ -57,8 +61,6 @@ def get_temphumi(out_pin):
         print("Terminated by Keyboard")
     finally:
         print("END")
-
-    return h
 
 
 def on_connect(client, userdata, flags, rc):
@@ -69,10 +71,10 @@ def on_connect(client, userdata, flags, rc):
     # 4: Connection refused - bad username or password
     # 5: Connection refused - not authorised
     # 6-255: Currently unused.
+    global local_mqtt_client
+
     if rc is 0:
         print('[local_mqtt_client_connect] connect to 127.0.0.1')
-        local_mqtt_client.subscribe("/puleunair/hotwater/req")
-        local_mqtt_client.subscribe("/puleunair/humi/req")
     elif rc is 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
@@ -102,16 +104,7 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 
 def on_message(client, userdata, _msg):
-    global g_res_event
-    global RES_HOTWATER
-    global RES_TEMPHUMI
-
-    if _msg.topic == '/puleunair/hotwater/req':
-        g_res_event |= RES_HOTWATER
-    elif _msg.topic == '/puleunair/humi/req':
-        g_res_event |= RES_TEMPHUMI
-    else:
-        print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
+    print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
 
 if __name__ == "__main__":
@@ -122,15 +115,4 @@ if __name__ == "__main__":
     local_mqtt_client.on_message = on_message
     local_mqtt_client.connect("127.0.0.1", 1883)
 
-    local_mqtt_client.loop_start()
-
-    while True:
-        if g_res_event & RES_HOTWATER:
-            g_res_event &= (~RES_HOTWATER)
-            g_res_hotwater = get_hotwater(cs, sck, so)
-            local_mqtt_client.publish(pub_hotwater_topic, g_res_hotwater)
-
-        elif g_res_event & RES_TEMPHUMI:
-            g_res_event &= (~RES_TEMPHUMI)
-            g_res_humi = get_temphumi(pin)
-            local_mqtt_client.publish(pub_humi_topic, g_res_humi)
+    local_mqtt_client.loop_forever()
