@@ -119,6 +119,10 @@ function startMenu() {
             
             term('\n').eraseDisplayBelow();
             
+            local_mqtt_client.publish('/puleunair/Control_3/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+            
             elapsed_count = 0;
             spray_count = 0;
             air_count = 0;
@@ -143,10 +147,13 @@ function startMenu() {
 }
 
 let elapsed_count = 0;
-let spray_period = 10; // minutes
 let spray_count = 0;
-let air_period = 10; // minutes
 let air_count = 0;
+
+let heater_period = 24.0; // temperature
+let spray_period = 10; // minutes
+let air_period = 10; // minutes
+let fan_period = 90;
 
 
 setInterval(() => {
@@ -164,17 +171,42 @@ setInterval(() => {
     term.moveTo.green(1, 11, "                                                                                    ");
     term.moveTo.green(1, 12, "                                                                                    ");
 
-    term.moveTo.green(1, 3, " Temperature - %s*C", temperature);
-    term.moveTo.green(1, 4, " Humidity - %s\%", humidity);
-    term.moveTo.green(1, 5, " Hotwater Temperature - %s*C\n", hotwater_temp);
+    term.moveTo.green(1, 3, "          Temperature: %s*C", temperature);
+    term.moveTo.green(1, 4, "             Humidity: %s\%", humidity);
+    term.moveTo.green(1, 5, " Hotwater Temperature: %s*C\n", hotwater_temp);
     
     if(placeFlag === 'autoMenu') {
-        term.moveTo.green(1, 7, " AUTO MODE\n");
-        term.moveTo.green(1, 8, " SPRAY: %d minutes per hour\n", spray_period);
-        term.moveTo.green(1, 9, "   AIR: %d minutes per hour\n", air_period);
+        term.moveTo.green(1, 7,  " AUTO MODE\n");
+        term.moveTo.green(1, 8,  "     HEATER: < %f*C\n", heater_period);
+        term.moveTo.green(1, 9,  "        AIR: %d minutes per hour\n", air_period);
+        term.moveTo.green(1, 10,  "       PUMP: always on\n");
+        term.moveTo.green(1, 11, "        FAN: > %f%\n", fan_period);
+        term.moveTo.green(1, 12, "      SPRAY: %d minutes per hour\n", spray_period);
+        
+        if(parseFloat(hotwater_temp) < heater_period) {
+            local_mqtt_client.publish('/puleunair/Control_1/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else if(parseFloat(hotwater_temp) > (heater_period + 0.4)) {
+            local_mqtt_client.publish('/puleunair/Control_1/set', '0', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        
+        if(parseFloat(humidity) > fan_period) {
+            local_mqtt_client.publish('/puleunair/Control_4/set', '1', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
+        else if(parseFloat(humidity) < (fan_period - 5)) {
+            local_mqtt_client.publish('/puleunair/Control_4/set', '0', () => {
+                // console.log('Send ON command to ' + control_selected);
+            });
+        }
         
         spray_count++;
-        /* if (0 <= spray_count && spray_count < (spray_period * 60)) {
+        if (0 <= spray_count && spray_count < (spray_period * 60)) {
             local_mqtt_client.publish('/puleunair/Control_5/set', '1', () => {
                 // console.log('Send ON command to ' + control_selected);
             });
@@ -186,42 +218,16 @@ setInterval(() => {
         }
         else {
             spray_count = 0;
-        }*/
-        if (0 <= spray_count && spray_count < (spray_period)) {
-            local_mqtt_client.publish('/puleunair/Control_5/set', '1', () => {
-                // console.log('Send ON command to ' + control_selected);
-            });
         }
-        else if ((spray_period) <= spray_count && spray_count < (60)) {
-            local_mqtt_client.publish('/puleunair/Control_5/set', '0', () => {
-                // console.log('Send ON command to ' + control_selected);
-            });
-        }
-        else {
-            spray_count = 0;
-        }
-
+        
         
         air_count++;
-        /*if (0 <= air_count && air_count < (air_period * 60)) {
+        if (0 <= air_count && air_count < (air_period * 60)) {
             local_mqtt_client.publish('/puleunair/Control_2/set', '1', () => {
                 // console.log('Send ON command to ' + control_selected);
             });
         }
         else if ((air_period * 60) <= air_count && air_count < (60 * 60)) {
-            local_mqtt_client.publish('/puleunair/Control_2/set', '0', () => {
-                // console.log('Send ON command to ' + control_selected);
-            });
-        }
-        else {
-            air_count = 0;
-        }*/
-        if (0 <= air_count && air_count < (air_period)) {
-            local_mqtt_client.publish('/puleunair/Control_2/set', '1', () => {
-                // console.log('Send ON command to ' + control_selected);
-            });
-        }
-        else if ((air_period) <= air_count && air_count < (60)) {
             local_mqtt_client.publish('/puleunair/Control_2/set', '0', () => {
                 // console.log('Send ON command to ' + control_selected);
             });
@@ -270,12 +276,6 @@ function autoMenu() {
 
         if (response.selectedText === 'Back') {
             setTimeout(startMenu, back_menu_delay);
-        } 
-        else if (response.selectedText === 'HeaterON') {
-            allOnMenu();
-        } 
-        else if (response.selectedText === 'OFF') {
-            allOffMenu();
         } 
         else {
             setTimeout(startMenu, back_menu_delay);
