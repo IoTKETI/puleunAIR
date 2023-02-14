@@ -159,8 +159,15 @@ let spray_period = 10; // minutes
 let air_period = 10; // minutes
 let fan_period = 90;
 
+let args = process.argv;
+let profile_name = 'Profile.json';
+
+if(args.hasOwnProperty('2')) {
+    profile_name = args[2];
+}
+
 try {
-    period = JSON.parse(fs.readFileSync('./Profile.json', 'utf8'));
+    period = JSON.parse(fs.readFileSync(profile_name, 'utf8'));
 
     heater_period = period.heater_period;
     spray_period = period.spray_period;
@@ -172,7 +179,7 @@ try {
     period.air_period = air_period;
     period.fan_period = fan_period;
 
-    fs.writeFileSync('./Profile.json', JSON.stringify(period, null, 4), 'utf8');
+    fs.writeFileSync(profile_name, JSON.stringify(period, null, 4), 'utf8');
 }
 
 setInterval(() => {
