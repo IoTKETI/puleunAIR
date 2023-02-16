@@ -2,11 +2,13 @@
 """
  @ Created by Wonseok Jung in KETI on 2023-02-10.
 """
+import time
 
 import paho.mqtt.client as mqtt
 import SX1509
 import Control
-import time
+import json
+import threading
 
 local_mqtt_client = None
 
@@ -17,12 +19,14 @@ SET_Control2 = 0x02
 SET_Control3 = 0x04
 SET_Control4 = 0x08
 SET_Control5 = 0x10
+SET_AUTO = 0x20
 
 Control1_val = 0
 Control2_val = 0
 Control3_val = 0
 Control4_val = 0
 Control5_val = 0
+AUTO_val = dict()
 
 Control1_pin = 10
 Control2_pin = 11
@@ -34,6 +38,14 @@ i2c_addr = 0x3e
 i2c_bus = 2
 sx = SX1509.SX1509(i2c_addr, i2c_bus)
 ctl = Control.Control(sx)
+
+hotwater = 0.0
+temperature = 0.0
+humidity = 0.0
+
+auto_mode = False
+spray_count = 0
+air_count = 0
 
 
 def set_Control1(val):
@@ -79,6 +91,10 @@ def on_connect(client, userdata, flags, rc):
         local_mqtt_client.subscribe("/puleunair/Control_3/set")
         local_mqtt_client.subscribe("/puleunair/Control_4/set")
         local_mqtt_client.subscribe("/puleunair/Control_5/set")
+        local_mqtt_client.subscribe("/puleunair/auto/set")
+        local_mqtt_client.subscribe("/puleunair/temperature")
+        local_mqtt_client.subscribe("/puleunair/humidity")
+        local_mqtt_client.subscribe("/puleunair/hotwater")
     elif rc is 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
@@ -114,11 +130,17 @@ def on_message(client, userdata, _msg):
     global SET_Control3
     global SET_Control4
     global SET_Control5
+    global SET_AUTO
     global Control1_val
     global Control2_val
     global Control3_val
     global Control4_val
     global Control5_val
+    global AUTO_val
+    global hotwater
+    global temperature
+    global humidity
+    global auto_mode
 
     if _msg.topic == '/puleunair/Control_1/set':
         Control1_val = int(_msg.payload.decode('utf-8'))
@@ -135,8 +157,58 @@ def on_message(client, userdata, _msg):
     elif _msg.topic == '/puleunair/Control_5/set':
         Control5_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control5
+    elif _msg.topic == '/puleunair/auto/set':
+        AUTO_val = json.loads(_msg.payload.decode('utf-8'))
+        g_set_event |= SET_AUTO
+    elif _msg.topic == '/puleunair/hotwater':
+        hotwater = float(_msg.payload.decode('utf-8'))
+    elif _msg.topic == '/puleunair/temperature':
+        temperature = float(_msg.payload.decode('utf-8'))
+    elif _msg.topic == '/puleunair/humidity':
+        humidity = float(_msg.payload.decode('utf-8'))
     else:
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
+
+
+def auto():
+    global AUTO_val
+    global hotwater
+    global temperature
+    global humidity
+    global auto_mode
+    global spray_count
+    global air_count
+
+    if auto_mode:
+        print(" AUTO MODE\n")
+        print("     HEATER: < %f*C\n", AUTO_val["heater_period"])
+        print("        AIR: %d minutes per hour\n", AUTO_val["air_period"])
+        print("       PUMP: always on\n")
+        print("        FAN: > %f%\n", AUTO_val["fan_period"])
+        print("      SPRAY: %d minutes per hour\n", AUTO_val["spray_period"])
+
+        if float(humidity) > AUTO_val["fan_period"]:
+            set_Control4(1)
+        elif float(humidity) < (AUTO_val["fan_period"] - 5):
+            set_Control4(0)
+
+        spray_count += 1
+        if (0 <= spray_count) and (spray_count < (AUTO_val["spray_period"] * 60)):
+            set_Control5(1)
+        elif ((AUTO_val["spray_period"] * 60) <= spray_count) and (spray_count < (60 * 60)):
+            set_Control5(0)
+        else:
+            spray_count = 0
+
+        air_count += 1
+        if (0 <= air_count) and (air_count < (AUTO_val["air_period"] * 60)):
+            set_Control2(1)
+        elif ((AUTO_val["air_period"] * 60) <= air_count) and (air_count < (60 * 60)):
+            set_Control2(0)
+        else:
+            air_count = 0
+
+    threading.Timer(1, auto).start()
 
 
 if __name__ == "__main__":
@@ -148,6 +220,8 @@ if __name__ == "__main__":
     local_mqtt_client.connect("127.0.0.1", 1883)
 
     local_mqtt_client.loop_start()
+
+    auto()
 
     while True:
         if g_set_event & SET_Control1:
@@ -165,16 +239,13 @@ if __name__ == "__main__":
         elif g_set_event & SET_Control5:
             g_set_event &= (~SET_Control5)
             set_Control5(Control5_val)
-#
-# count = 0
-#
-# while True:
-#     count += 1
-#     count %= 2
-#     ctl.DOUT(Control1_pin, count)
-#     ctl.DOUT(Control2_pin, count)
-#     ctl.DOUT(Control3_pin, count)
-#     ctl.DOUT(Control4_pin, count)
-#     ctl.DOUT(Control5_pin, count)
-#     print(count)
-#     time.sleep(1)
+        elif g_set_event & SET_AUTO:
+            g_set_event &= (~SET_AUTO)
+            if AUTO_val.get('auto'):
+                if int(AUTO_val["auto"]) == 1:
+                    spray_count = 0
+                    air_count = 0
+                    auto_mode = True
+                else:
+                    auto_mode = False
+
