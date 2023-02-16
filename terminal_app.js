@@ -130,12 +130,6 @@ function startMenu() {
             spray_count = 0;
             air_count = 0;
 
-            period.auto = 1
-
-            local_mqtt_client.publish('/puleunair/auto/set', JSON.stringify(period), () => {
-                console.log('Send AUTO command to /puleunair/auto/set');
-            });
-
             autoMenu();
         }
         else {
@@ -210,68 +204,80 @@ setInterval(() => {
     }
 }, 1000);
 
-// setInterval(() => {
-//     elapsed_count++;
-//
-//     term.moveTo.green(1, 6, "                                                                                    ");
-//     term.moveTo.green(1, 7, "                                                                                    ");
-//     term.moveTo.green(1, 8, "                                                                                    ");
-//     term.moveTo.green(1, 9, "                                                                                    ");
-//     term.moveTo.green(1, 10, "                                                                                    ");
-//     term.moveTo.green(1, 11, "                                                                                    ");
-//     term.moveTo.green(1, 12, "                                                                                    ");
-//
-//     if(placeFlag === 'autoMenu') {
-//         term.moveTo.green(1, 7,  " AUTO MODE\n");
-//         term.moveTo.green(1, 8,  "     HEATER: < %f*C\n", heater_period);
-//         term.moveTo.green(1, 9,  "        AIR: %d minutes per hour\n", air_period);
-//         term.moveTo.green(1, 10,  "       PUMP: always on\n");
-//         term.moveTo.green(1, 11, "        FAN: > %f%\n", fan_period);
-//         term.moveTo.green(1, 12, "      SPRAY: %d minutes per hour\n", spray_period);
-//
-//         if(parseFloat(humidity) > fan_period) {
-//             local_mqtt_client.publish('/puleunair/Control_4/set', '1', () => {
-//                 // console.log('Send ON command to ' + control_selected);
-//             });
-//         }
-//         else if(parseFloat(humidity) < (fan_period - 5)) {
-//             local_mqtt_client.publish('/puleunair/Control_4/set', '0', () => {
-//                 // console.log('Send ON command to ' + control_selected);
-//             });
-//         }
-//
-//         spray_count++;
-//         if (0 <= spray_count && spray_count < (spray_period * 60)) {
-//             local_mqtt_client.publish('/puleunair/Control_5/set', '1', () => {
-//                 // console.log('Send ON command to ' + control_selected);
-//             });
-//         }
-//         else if ((spray_period * 60) <= spray_count && spray_count < (60 * 60)) {
-//             local_mqtt_client.publish('/puleunair/Control_5/set', '0', () => {
-//                 // console.log('Send ON command to ' + control_selected);
-//             });
-//         }
-//         else {
-//             spray_count = 0;
-//         }
-//
-//
-//         air_count++;
-//         if (0 <= air_count && air_count < (air_period * 60)) {
-//             local_mqtt_client.publish('/puleunair/Control_2/set', '1', () => {
-//                 // console.log('Send ON command to ' + control_selected);
-//             });
-//         }
-//         else if ((air_period * 60) <= air_count && air_count < (60 * 60)) {
-//             local_mqtt_client.publish('/puleunair/Control_2/set', '0', () => {
-//                 // console.log('Send ON command to ' + control_selected);
-//             });
-//         }
-//         else {
-//             air_count = 0;
-//         }
-//     }
-// }, 1000);
+setInterval(() => {
+    // elapsed_count++;
+    //
+    // term.moveTo.green(1, 6, "                                                                                    ");
+    // term.moveTo.green(1, 7, "                                                                                    ");
+    // term.moveTo.green(1, 8, "                                                                                    ");
+    // term.moveTo.green(1, 9, "                                                                                    ");
+    // term.moveTo.green(1, 10, "                                                                                    ");
+    // term.moveTo.green(1, 11, "                                                                                    ");
+    // term.moveTo.green(1, 12, "                                                                                    ");
+
+    if(placeFlag === 'autoMenu') {
+        period.auto = 1;
+
+        local_mqtt_client.publish('/puleunair/auto/set', JSON.stringify(period), () => {
+            console.log('Send AUTO command to /puleunair/auto/set');
+        });
+
+        // term.moveTo.green(1, 7,  " AUTO MODE\n");
+        // term.moveTo.green(1, 8,  "     HEATER: < %f*C\n", heater_period);
+        // term.moveTo.green(1, 9,  "        AIR: %d minutes per hour\n", air_period);
+        // term.moveTo.green(1, 10,  "       PUMP: always on\n");
+        // term.moveTo.green(1, 11, "        FAN: > %f%\n", fan_period);
+        // term.moveTo.green(1, 12, "      SPRAY: %d minutes per hour\n", spray_period);
+        //
+        // if(parseFloat(humidity) > fan_period) {
+        //     local_mqtt_client.publish('/puleunair/Control_4/set', '1', () => {
+        //         // console.log('Send ON command to ' + control_selected);
+        //     });
+        // }
+        // else if(parseFloat(humidity) < (fan_period - 5)) {
+        //     local_mqtt_client.publish('/puleunair/Control_4/set', '0', () => {
+        //         // console.log('Send ON command to ' + control_selected);
+        //     });
+        // }
+        //
+        // spray_count++;
+        // if (0 <= spray_count && spray_count < (spray_period * 60)) {
+        //     local_mqtt_client.publish('/puleunair/Control_5/set', '1', () => {
+        //         // console.log('Send ON command to ' + control_selected);
+        //     });
+        // }
+        // else if ((spray_period * 60) <= spray_count && spray_count < (60 * 60)) {
+        //     local_mqtt_client.publish('/puleunair/Control_5/set', '0', () => {
+        //         // console.log('Send ON command to ' + control_selected);
+        //     });
+        // }
+        // else {
+        //     spray_count = 0;
+        // }
+        //
+        //
+        // air_count++;
+        // if (0 <= air_count && air_count < (air_period * 60)) {
+        //     local_mqtt_client.publish('/puleunair/Control_2/set', '1', () => {
+        //         // console.log('Send ON command to ' + control_selected);
+        //     });
+        // }
+        // else if ((air_period * 60) <= air_count && air_count < (60 * 60)) {
+        //     local_mqtt_client.publish('/puleunair/Control_2/set', '0', () => {
+        //         // console.log('Send ON command to ' + control_selected);
+        //     });
+        // }
+        // else {
+        //     air_count = 0;
+        // }
+    } else {
+        period.auto = 0;
+
+        local_mqtt_client.publish('/puleunair/auto/set', JSON.stringify(period), () => {
+            console.log('Send AUTO command to /puleunair/auto/set');
+        });
+    }
+}, 1000);
 
 let placeFlag = '';
 let printFlag = '';
