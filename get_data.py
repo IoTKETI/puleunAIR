@@ -117,7 +117,7 @@ if __name__ == "__main__":
     local_mqtt_client.on_message = on_message
     local_mqtt_client.connect("127.0.0.1", 1883)
 
-    local_mqtt_client.loop_forever()
+    local_mqtt_client.loop_start()
 
     max6675.set_pin(cs, sck, so, 1)
 
