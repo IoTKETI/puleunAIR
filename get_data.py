@@ -7,6 +7,7 @@ import paho.mqtt.client as mqtt
 import max6675
 import Adafruit_DHT as dht
 import time
+import threading
 
 local_mqtt_client = None
 pub_hotwater_topic = "/puleunair/hotwater/res"
@@ -20,7 +21,7 @@ so = 16
 pin = 11
 
 
-def get_hotwater(cs, sck, so):
+def get_hotwater(cs):
     global local_mqtt_client
 
     #    max6675.set_pin(cs, sck, so, 1)
@@ -33,16 +34,18 @@ def get_hotwater(cs, sck, so):
             local_mqtt_client.publish('/puleunair/hotwater', temp)
         else:
             local_mqtt_client.reconnect()
-        max6675.time.sleep(1)
 
     except KeyboardInterrupt:
         pass
+
+    threading.Timer(1.0, get_hotwater, args=[cs]).start()
 
 
 def get_temphumi(out_pin):
     global local_mqtt_client
 
     # sensor = dht.DHT22
+
     try:
         h, t = dht.read_retry(sensor, out_pin)
 
@@ -58,6 +61,8 @@ def get_temphumi(out_pin):
             time.sleep(100)
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
+
+    threading.Timer(1.0, get_temphumi, args=[pin]).start()
 
 
 def on_connect(client, userdata, flags, rc):
@@ -112,18 +117,12 @@ if __name__ == "__main__":
     local_mqtt_client.on_message = on_message
     local_mqtt_client.connect("127.0.0.1", 1883)
 
-    local_mqtt_client.loop_start()
+    local_mqtt_client.loop_forever()
 
     max6675.set_pin(cs, sck, so, 1)
 
     sensor = dht.DHT22
 
-    toggle = 0
-    while True:
-        toggle += 1
-        toggle %= 2
-        if toggle == 0:
-            get_hotwater(cs, sck, so)
-        else:
-            get_temphumi(pin)
-        time.sleep(0.5)
+    get_hotwater(cs)
+
+    get_temphumi(pin)
