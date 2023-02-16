@@ -55,7 +55,7 @@ function local_mqtt_connect(serverip) {
                 local_mqtt_client.subscribe(sub_temperature_topic);
                 console.log('[local_mqtt] sub_temperature_topic is subscribed: ' + sub_temperature_topic);
             }
-     });
+        });
 
         local_mqtt_client.on('message', function (topic, message) {
             if (topic === sub_watertemp_topic) {
@@ -72,7 +72,7 @@ function local_mqtt_connect(serverip) {
                 // console.log('sub_temperature_topic - ', message.toString());
                 temperature = message.toString();
             }
-    });
+        });
 
         local_mqtt_client.on('error', function (err) {
             console.log('[local_mqtt] (error) ' + err.message);
@@ -91,7 +91,7 @@ let startmenu_list = control_items;
 
 function startMenu() {
     placeFlag = 'startMenu';
-    
+
     let _options = {
         y: 1,	// the menu will be on the top of the terminal
         style: term.inverse,
@@ -183,12 +183,30 @@ try {
 }
 
 setInterval(() => {
-    elapsed_count++;
-
     term.moveTo.green(1, 2, "                                                                                    ");
     term.moveTo.green(1, 3, "                                                                                    ");
     term.moveTo.green(1, 4, "                                                                                    ");
     term.moveTo.green(1, 5, "                                                                                    ");
+
+    term.moveTo.green(1, 3, "          Temperature: %s*C", parseFloat(temperature).toFixed(1));
+    term.moveTo.green(1, 4, "             Humidity: %s\%", parseFloat(humidity).toFixed(1));
+    term.moveTo.green(1, 5, " Hotwater Temperature: %s*C\n", hotwater_temp);
+
+    if(parseFloat(hotwater_temp) < heater_period) {
+        local_mqtt_client.publish('/puleunair/Control_1/set', '1', () => {
+            // console.log('Send ON command to ' + control_selected);
+        });
+    }
+    else if(parseFloat(hotwater_temp) > (heater_period + 0.4)) {
+        local_mqtt_client.publish('/puleunair/Control_1/set', '0', () => {
+            // console.log('Send ON command to ' + control_selected);
+        });
+    }
+}, 1000);
+
+setInterval(() => {
+    elapsed_count++;
+
     term.moveTo.green(1, 6, "                                                                                    ");
     term.moveTo.green(1, 7, "                                                                                    ");
     term.moveTo.green(1, 8, "                                                                                    ");
@@ -197,10 +215,6 @@ setInterval(() => {
     term.moveTo.green(1, 11, "                                                                                    ");
     term.moveTo.green(1, 12, "                                                                                    ");
 
-    term.moveTo.green(1, 3, "          Temperature: %s*C", temperature);
-    term.moveTo.green(1, 4, "             Humidity: %s\%", humidity);
-    term.moveTo.green(1, 5, " Hotwater Temperature: %s*C\n", hotwater_temp);
-
     if(placeFlag === 'autoMenu') {
         term.moveTo.green(1, 7,  " AUTO MODE\n");
         term.moveTo.green(1, 8,  "     HEATER: < %f*C\n", heater_period);
@@ -208,17 +222,6 @@ setInterval(() => {
         term.moveTo.green(1, 10,  "       PUMP: always on\n");
         term.moveTo.green(1, 11, "        FAN: > %f%\n", fan_period);
         term.moveTo.green(1, 12, "      SPRAY: %d minutes per hour\n", spray_period);
-
-        if(parseFloat(hotwater_temp) < heater_period) {
-            local_mqtt_client.publish('/puleunair/Control_1/set', '1', () => {
-                // console.log('Send ON command to ' + control_selected);
-            });
-        }
-        else if(parseFloat(hotwater_temp) > (heater_period + 0.4)) {
-            local_mqtt_client.publish('/puleunair/Control_1/set', '0', () => {
-                // console.log('Send ON command to ' + control_selected);
-            });
-        }
 
         if(parseFloat(humidity) > fan_period) {
             local_mqtt_client.publish('/puleunair/Control_4/set', '1', () => {
@@ -262,8 +265,6 @@ setInterval(() => {
             air_count = 0;
         }
     }
-
-
 }, 1000);
 
 let placeFlag = '';
