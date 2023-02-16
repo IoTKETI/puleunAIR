@@ -23,7 +23,7 @@ pin = 11
 def get_hotwater(cs, sck, so):
     global local_mqtt_client
 
-    max6675.set_pin(cs, sck, so, 1)
+    #    max6675.set_pin(cs, sck, so, 1)
 
     try:
         temp = max6675.read_temp(cs)
@@ -33,7 +33,7 @@ def get_hotwater(cs, sck, so):
             local_mqtt_client.publish('/puleunair/hotwater', temp)
         else:
             local_mqtt_client.reconnect()
-        max6675.time.sleep(2)
+        max6675.time.sleep(1)
 
     except KeyboardInterrupt:
         pass
@@ -42,7 +42,7 @@ def get_hotwater(cs, sck, so):
 def get_temphumi(out_pin):
     global local_mqtt_client
 
-    sensor = dht.DHT11
+    # sensor = dht.DHT22
     try:
         h, t = dht.read_retry(sensor, out_pin)
 
@@ -114,6 +114,16 @@ if __name__ == "__main__":
 
     local_mqtt_client.loop_start()
 
+    max6675.set_pin(cs, sck, so, 1)
+
+    sensor = dht.DHT22
+
+    toggle = 0
     while True:
-        get_hotwater(cs, sck, so)
-        get_temphumi(pin)
+        toggle += 1
+        toggle %= 2
+        if toggle == 0:
+            get_hotwater(cs, sck, so)
+        else:
+            get_temphumi(pin)
+        time.sleep(0.5)
