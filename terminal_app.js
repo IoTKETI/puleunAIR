@@ -192,16 +192,16 @@ setInterval(() => {
     term.moveTo.green(1, 4, "             Humidity: %s\%", parseFloat(humidity).toFixed(1));
     term.moveTo.green(1, 5, " Hotwater Temperature: %s*C\n", hotwater_temp);
 
-    if(parseFloat(hotwater_temp) < heater_period) {
-        local_mqtt_client.publish('/puleunair/Control_1/set', '1', () => {
-            // console.log('Send ON command to ' + control_selected);
-        });
-    }
-    else if(parseFloat(hotwater_temp) > (heater_period + 0.4)) {
-        local_mqtt_client.publish('/puleunair/Control_1/set', '0', () => {
-            // console.log('Send ON command to ' + control_selected);
-        });
-    }
+    // if(parseFloat(hotwater_temp) < heater_period) {
+    //     local_mqtt_client.publish('/puleunair/Control_1/set', '1', () => {
+    //         // console.log('Send ON command to ' + control_selected);
+    //     });
+    // }
+    // else if(parseFloat(hotwater_temp) > (heater_period + 0.4)) {
+    //     local_mqtt_client.publish('/puleunair/Control_1/set', '0', () => {
+    //         // console.log('Send ON command to ' + control_selected);
+    //     });
+    // }
 }, 1000);
 
 setInterval(() => {

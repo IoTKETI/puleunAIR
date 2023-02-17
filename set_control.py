@@ -208,6 +208,12 @@ def auto():
         else:
             air_count = 0
 
+    if (float(hotwater_temp) < AUTO_val["heater_period"]:
+        set_Control1(1)
+    elif (float(hotwater_temp) > AUTO_val["heater_period"] + 0.4):
+        set_Control1(0)
+    }
+
     threading.Timer(1, auto).start()
 
 
