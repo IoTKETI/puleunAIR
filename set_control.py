@@ -2,8 +2,6 @@
 """
  @ Created by Wonseok Jung in KETI on 2023-02-10.
 """
-import time
-
 import paho.mqtt.client as mqtt
 import SX1509
 import Control
@@ -11,6 +9,7 @@ import json
 import threading
 
 local_mqtt_client = None
+pub_status_topic = '/puleunair/status'
 
 g_set_event = 0x00
 
@@ -49,27 +48,42 @@ air_count = 0
 
 
 def set_Control1(val):
+    global AUTO_val
+
     ctl.DOUT(Control1_pin, val)
+    AUTO_val["ctrl1"] = val
     print("Control Control1 - ", val)
 
 
 def set_Control2(val):
+    global AUTO_val
+
     ctl.DOUT(Control2_pin, val)
+    AUTO_val["ctrl2"] = val
     print("Control Control2 - ", val)
 
 
 def set_Control3(val):
+    global AUTO_val
+
     ctl.DOUT(Control3_pin, val)
+    AUTO_val["ctrl3"] = val
     print("Control Control3 - ", val)
 
 
 def set_Control4(val):
+    global AUTO_val
+
     ctl.DOUT(Control4_pin, val)
+    AUTO_val["ctrl4"] = val
     print("Control Control4 - ", val)
 
 
 def set_Control5(val):
+    global AUTO_val
+
     ctl.DOUT(Control5_pin, val)
+    AUTO_val["ctrl5"] = val
     print("Control Control5 - ", val)
 
 
@@ -85,7 +99,7 @@ def on_connect(client, userdata, flags, rc):
     global local_mqtt_client
 
     if rc is 0:
-        print('[local_mqtt_client_connect] connect to 127.0.0.1')
+        print('[local_mqtt_client_connect] connect to 121.137.228.240')
         local_mqtt_client.subscribe("/puleunair/Control_1/set")
         local_mqtt_client.subscribe("/puleunair/Control_2/set")
         local_mqtt_client.subscribe("/puleunair/Control_3/set")
@@ -213,7 +227,17 @@ def auto():
     elif float(hotwater) > AUTO_val["heater_period"] + 0.4:
         set_Control1(0)
 
-    threading.Timer(1, auto).start()
+    threading.Timer(1.0, auto).start()
+
+
+def sendStatus():
+    global local_mqtt_client
+    global pub_status_topic
+
+    if local_mqtt_client is not None:
+        local_mqtt_client.publish(pub_status_topic, json.dumps(AUTO_val))
+
+    threading.Timer(2.0, sendStatus).start()
 
 
 if __name__ == "__main__":
@@ -222,11 +246,29 @@ if __name__ == "__main__":
     local_mqtt_client.on_disconnect = on_disconnect
     local_mqtt_client.on_subscribe = on_subscribe
     local_mqtt_client.on_message = on_message
-    local_mqtt_client.connect("127.0.0.1", 1883)
+    local_mqtt_client.connect("121.137.228.240", 1883)
 
     local_mqtt_client.loop_start()
 
+    try:
+        with open('Profile.json', 'r') as user_file:
+            AUTO_val = user_file.read()
+    except Exception as e:
+        AUTO_val["heater_period"] = 24.0
+        AUTO_val["spray_period"] = 10
+        AUTO_val["air_period"] = 10
+        AUTO_val["fan_period"] = 90
+        AUTO_val["ctrl1"] = 0
+        AUTO_val["ctrl2"] = 0
+        AUTO_val["ctrl3"] = 0
+        AUTO_val["ctrl4"] = 0
+        AUTO_val["ctrl5"] = 0
+
+        with open('Profile.json', 'w') as outfile:
+            json.dump(AUTO_val, outfile, indent=4)
+
     auto()
+    sendStatus()
 
     while True:
         if g_set_event & SET_Control1:

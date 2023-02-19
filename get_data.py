@@ -20,9 +20,12 @@ so = 16
 # Humidity
 pin = 11
 
+get_data_interval = 2.0
+
 
 def get_hotwater(cs):
     global local_mqtt_client
+    global get_data_interval
 
     #    max6675.set_pin(cs, sck, so, 1)
 
@@ -38,12 +41,12 @@ def get_hotwater(cs):
     except KeyboardInterrupt:
         pass
 
-    threading.Timer(1.0, get_hotwater, args=[cs]).start()
+    threading.Timer(get_data_interval, get_hotwater, args=[cs]).start()
 
 
 def get_temphumi(out_pin):
     global local_mqtt_client
-
+    global get_data_interval
     # sensor = dht.DHT22
 
     try:
@@ -62,7 +65,7 @@ def get_temphumi(out_pin):
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
-    threading.Timer(1.0, get_temphumi, args=[pin]).start()
+    threading.Timer(get_data_interval, get_temphumi, args=[pin]).start()
 
 
 def on_connect(client, userdata, flags, rc):
@@ -76,7 +79,7 @@ def on_connect(client, userdata, flags, rc):
     global local_mqtt_client
 
     if rc is 0:
-        print('[local_mqtt_client_connect] connect to 127.0.0.1')
+        print('[local_mqtt_client_connect] connect to 121.137.228.240')
     elif rc is 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
@@ -115,7 +118,7 @@ if __name__ == "__main__":
     local_mqtt_client.on_disconnect = on_disconnect
     local_mqtt_client.on_subscribe = on_subscribe
     local_mqtt_client.on_message = on_message
-    local_mqtt_client.connect("127.0.0.1", 1883)
+    local_mqtt_client.connect("121.137.228.240", 1883)
 
     local_mqtt_client.loop_start()
 

@@ -16,7 +16,7 @@ let hotwater_temp = 0.0;
 let humidity = 0.0;
 let temperature = 0.0;
 
-local_mqtt_connect('127.0.0.1');
+local_mqtt_connect('121.137.228.240');
 
 const control_items = ['Quit', 'Control_1', 'Control_2', 'Control_3', 'Control_4', 'Control_5', 'All', 'AUTO'];
 const auto_items = ['Back', 'Heater', 'Air', 'Pump', 'Fan', 'Spray'];
