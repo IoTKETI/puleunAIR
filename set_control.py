@@ -290,6 +290,7 @@ if __name__ == "__main__":
             set_Control5(Control5_val)
         elif g_set_event & SET_AUTO:
             g_set_event &= (~SET_AUTO)
+            print(AUTO_val)
             if AUTO_val.get('auto'):
                 if int(AUTO_val["auto"]) == 1:
                     spray_count = 0
