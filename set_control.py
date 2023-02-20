@@ -197,11 +197,11 @@ def auto():
 
     if auto_mode:
         print(" AUTO MODE\n")
-        print("     HEATER: < %f*C\n", AUTO_val["heater_period"])
-        print("        AIR: %d minutes per hour\n", AUTO_val["air_period"])
-        print("       PUMP: always on\n")
-        print("        FAN: > %f%\n", AUTO_val["fan_period"])
-        print("      SPRAY: %d minutes per hour\n", AUTO_val["spray_period"])
+        # print("     HEATER: < %f*C\n", AUTO_val["heater_period"])
+        # print("        AIR: %d minutes per hour\n", AUTO_val["air_period"])
+        # print("       PUMP: always on\n")
+        # print("        FAN: > %f%\n", AUTO_val["fan_period"])
+        # print("      SPRAY: %d minutes per hour\n", AUTO_val["spray_period"])
 
         if float(humidity) > AUTO_val["fan_period"]:
             set_Control4(1)
@@ -296,4 +296,5 @@ if __name__ == "__main__":
                     air_count = 0
                     auto_mode = True
                 else:
+                    print(auto_mode)
                     auto_mode = False
