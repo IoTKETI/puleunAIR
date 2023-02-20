@@ -295,6 +295,7 @@ if __name__ == "__main__":
             if int(AUTO_val["auto"]) == 1:
                 spray_count = 0
                 air_count = 0
+                set_Control3(1)
                 auto_mode = True
             elif int(AUTO_val["auto"]) == 0:
                 auto_mode = False
