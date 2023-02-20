@@ -295,6 +295,6 @@ if __name__ == "__main__":
                     spray_count = 0
                     air_count = 0
                     auto_mode = True
-                else:
+                elif int(AUTO_val["auto"]) == 0:
                     print(auto_mode)
                     auto_mode = False
