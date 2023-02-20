@@ -231,14 +231,7 @@ def auto():
     elif float(hotwater) > float(AUTO_val["heater_period"]) + 0.4:
         set_Control1(0)
 
-    if AUTO_val.get('auto'):
-        if int(AUTO_val["auto"]) == 1:
-            spray_count = 0
-            air_count = 0
-            auto_mode = True
-            threading.Timer(1.0, auto).start()
-        elif int(AUTO_val["auto"]) == 0:
-            auto_mode = False
+    threading.Timer(1.0, auto).start()
 
 
 def sendStatus():
@@ -299,3 +292,10 @@ if __name__ == "__main__":
             set_Control5(Control5_val)
         elif g_set_event & SET_AUTO:
             g_set_event &= (~SET_AUTO)
+            if int(AUTO_val["auto"]) == 1:
+                spray_count = 0
+                air_count = 0
+                auto_mode = True
+            elif int(AUTO_val["auto"]) == 0:
+                print(AUTO_val)
+                auto_mode = False
