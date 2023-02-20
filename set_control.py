@@ -54,7 +54,7 @@ def set_Control1(val):
 
     ctl.DOUT(Control1_pin, val)
     AUTO_val["ctrl1"] = val
-    # print("Control Control1 - ", val)
+    print("Control Control1 - ", val)
 
 
 def set_Control2(val):
@@ -62,7 +62,7 @@ def set_Control2(val):
 
     ctl.DOUT(Control2_pin, val)
     AUTO_val["ctrl2"] = val
-    # print("Control Control2 - ", val)
+    print("Control Control2 - ", val)
 
 
 def set_Control3(val):
@@ -70,7 +70,7 @@ def set_Control3(val):
 
     ctl.DOUT(Control3_pin, val)
     AUTO_val["ctrl3"] = val
-    # print("Control Control3 - ", val)
+    print("Control Control3 - ", val)
 
 
 def set_Control4(val):
@@ -78,7 +78,7 @@ def set_Control4(val):
 
     ctl.DOUT(Control4_pin, val)
     AUTO_val["ctrl4"] = val
-    # print("Control Control4 - ", val)
+    print("Control Control4 - ", val)
 
 
 def set_Control5(val):
@@ -86,7 +86,7 @@ def set_Control5(val):
 
     ctl.DOUT(Control5_pin, val)
     AUTO_val["ctrl5"] = val
-    # print("Control Control5 - ", val)
+    print("Control Control5 - ", val)
 
 
 def on_connect(client, userdata, flags, rc):
@@ -231,6 +231,15 @@ def auto():
     elif float(hotwater) > float(AUTO_val["heater_period"]) + 0.4:
         set_Control1(0)
 
+    if AUTO_val.get('auto'):
+        if int(AUTO_val["auto"]) == 1:
+            spray_count = 0
+            air_count = 0
+            auto_mode = True
+            threading.Timer(1.0, auto).start()
+        elif int(AUTO_val["auto"]) == 0:
+            auto_mode = False
+
 
 def sendStatus():
     global local_mqtt_client
@@ -290,14 +299,3 @@ if __name__ == "__main__":
             set_Control5(Control5_val)
         elif g_set_event & SET_AUTO:
             g_set_event &= (~SET_AUTO)
-            if AUTO_val.get('auto'):
-                if int(AUTO_val["auto"]) == 1:
-                    spray_count = 0
-                    air_count = 0
-                    auto_mode = True
-                    t_auto = threading.Timer(1.0, auto)
-                    t_auto.start()
-                elif int(AUTO_val["auto"]) == 0:
-                    print(auto_mode)
-                    auto_mode = False
-                    t_auto.cancel()
