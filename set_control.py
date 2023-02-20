@@ -222,9 +222,9 @@ def auto():
         else:
             air_count = 0
 
-    if float(hotwater) < AUTO_val["heater_period"]:
+    if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
-    elif float(hotwater) > AUTO_val["heater_period"] + 0.4:
+    elif float(hotwater) > float(AUTO_val["heater_period"]) + 0.4:
         set_Control1(0)
 
     threading.Timer(1.0, auto).start()
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
     try:
         with open('Profile.json', 'r') as user_file:
-            AUTO_val = user_file.read()
+            AUTO_val = json.loads(user_file.read())
     except Exception as e:
         AUTO_val["heater_period"] = 24.0
         AUTO_val["spray_period"] = 10
