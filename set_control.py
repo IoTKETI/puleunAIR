@@ -172,7 +172,9 @@ def on_message(client, userdata, _msg):
         Control5_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control5
     elif _msg.topic == '/puleunair/auto/set':
-        AUTO_val = json.loads(_msg.payload.decode('utf-8'))
+        recv_auto_val = json.loads(_msg.payload.decode('utf-8'))
+        for key in recv_auto_val.keys():
+            AUTO_val[key] = recv_auto_val[key]
         g_set_event |= SET_AUTO
     elif _msg.topic == '/puleunair/hotwater':
         hotwater = float(_msg.payload.decode('utf-8'))
