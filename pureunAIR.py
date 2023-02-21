@@ -331,7 +331,7 @@ if __name__ == "__main__":
     local_mqtt_client.on_message = on_message
     local_mqtt_client.connect(HOST, 1883)
 
-    local_mqtt_client.loop_forever()
+    local_mqtt_client.loop_start()
 
     try:
         with open('Profile.json', 'r') as user_file:
