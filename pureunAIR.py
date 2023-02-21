@@ -318,7 +318,7 @@ def sendStatus():
 
     if local_mqtt_client is not None:
         local_mqtt_client.publish(pub_status_topic, json.dumps(AUTO_val))
-        crt_cin("PureunAir/PA1/sttus", AUTO_val)
+        crt_cin("PureunAir/PA1/status", AUTO_val)
 
     threading.Timer(2.0, sendStatus).start()
 
