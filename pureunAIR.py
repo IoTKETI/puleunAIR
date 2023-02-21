@@ -3,13 +3,17 @@
  @ Created by Wonseok Jung in KETI on 2023-02-10.
 """
 import paho.mqtt.client as mqtt
-import max6675
-import Adafruit_DHT as dht
 import time
-import SX1509
-import Control
 import json
 import threading
+import requests
+
+import max6675
+import Adafruit_DHT as dht
+import SX1509
+import Control
+
+HOST = '121.137.228.240'
 
 local_mqtt_client = None
 pub_status_topic = '/puleunair/status'
@@ -65,12 +69,31 @@ air_count = 0
 t_auto = None
 
 
+def crt_cin(url, con):
+    global HOST
+
+    url = "http://" + HOST + ":7579/Mobius/" + url
+
+    payload = dict()
+    payload["m2m:cin"] = dict()
+    payload["m2m:cin"]["con"] = con
+
+    headers = {
+        'Accept': 'application/json',
+        'X-M2M-RI': '12345',
+        'X-M2M-Origin': 'Spureunair',
+        'Content-Type': 'application/json; ty=4'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
+
+    print(response.headers['X-M2M-RSC'], '-', response.text)
+
+
 def get_hotwater(cs):
     global local_mqtt_client
     global get_data_interval
     global hotwater
-
-    #    max6675.set_pin(cs, sck, so, 1)
 
     try:
         temp = max6675.read_temp(cs)
@@ -78,6 +101,7 @@ def get_hotwater(cs):
         print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
         if local_mqtt_client is not None:
             local_mqtt_client.publish('/puleunair/hotwater', hotwater)
+            crt_cin("PureunAir/PA1/hotwater", hotwater)
         else:
             local_mqtt_client.reconnect()
 
@@ -92,7 +116,6 @@ def get_temphumi(out_pin):
     global get_data_interval
     global temperature
     global humidity
-    # sensor = dht.DHT22
 
     try:
         humidity, temperature = dht.read_retry(sensor, out_pin)
@@ -101,7 +124,9 @@ def get_temphumi(out_pin):
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temperature, humidity))
             if local_mqtt_client is not None:
                 local_mqtt_client.publish('/puleunair/temperature', temperature)
+                crt_cin("PureunAir/PA1/temp", temperature)
                 local_mqtt_client.publish('/puleunair/humidity', humidity)
+                crt_cin("PureunAir/PA1/humi", humidity)
             else:
                 local_mqtt_client.reconnect()
         else:
@@ -163,28 +188,29 @@ def on_connect(client, userdata, flags, rc):
     # 6-255: Currently unused.
 
     global local_mqtt_client
+    global HOST
 
-    if rc is 0:
-        print('[local_mqtt_client_connect] connect to 121.137.228.240')
+    if rc == 0:
+        print('[local_mqtt_client_connect] connect to ' + HOST)
         local_mqtt_client.subscribe("/puleunair/Control_1/set")
         local_mqtt_client.subscribe("/puleunair/Control_2/set")
         local_mqtt_client.subscribe("/puleunair/Control_3/set")
         local_mqtt_client.subscribe("/puleunair/Control_4/set")
         local_mqtt_client.subscribe("/puleunair/Control_5/set")
         local_mqtt_client.subscribe("/puleunair/auto/set")
-    elif rc is 1:
+    elif rc == 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
-    elif rc is 2:
+    elif rc == 2:
         print("invalid client identifier")
         local_mqtt_client.reconnect()
-    elif rc is 3:
+    elif rc == 3:
         print("server unavailable")
         local_mqtt_client.reconnect()
-    elif rc is 4:
+    elif rc == 4:
         print("bad username or password")
         local_mqtt_client.reconnect()
-    elif rc is 5:
+    elif rc == 5:
         print("not authorised")
         local_mqtt_client.reconnect()
     else:
@@ -215,9 +241,6 @@ def on_message(client, userdata, _msg):
     global Control5_val
     global AUTO_val
     global auto_mode
-    # global hotwater
-    # global temperature
-    # global humidity
 
     if _msg.topic == '/puleunair/Control_1/set':
         Control1_val = int(_msg.payload.decode('utf-8'))
@@ -239,12 +262,6 @@ def on_message(client, userdata, _msg):
         for key in recv_auto_val.keys():
             AUTO_val[key] = recv_auto_val[key]
         g_set_event |= SET_AUTO
-    # elif _msg.topic == '/puleunair/hotwater':
-    #     hotwater = float(_msg.payload.decode('utf-8'))
-    # elif _msg.topic == '/puleunair/temperature':
-    #     temperature = float(_msg.payload.decode('utf-8'))
-    # elif _msg.topic == '/puleunair/humidity':
-    #     humidity = float(_msg.payload.decode('utf-8'))
     else:
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
@@ -301,6 +318,7 @@ def sendStatus():
 
     if local_mqtt_client is not None:
         local_mqtt_client.publish(pub_status_topic, json.dumps(AUTO_val))
+        crt_cin("PureunAir/PA1/sttus", AUTO_val)
 
     threading.Timer(2.0, sendStatus).start()
 
@@ -311,9 +329,9 @@ if __name__ == "__main__":
     local_mqtt_client.on_disconnect = on_disconnect
     local_mqtt_client.on_subscribe = on_subscribe
     local_mqtt_client.on_message = on_message
-    local_mqtt_client.connect("121.137.228.240", 1883)
+    local_mqtt_client.connect(HOST, 1883)
 
-    local_mqtt_client.loop_start()
+    local_mqtt_client.loop_forever()
 
     try:
         with open('Profile.json', 'r') as user_file:
@@ -342,7 +360,7 @@ if __name__ == "__main__":
     get_hotwater(cs)
 
     get_temphumi(pin)
-    # get_temphumi(ctl.DIN(th_pin))
+    get_temphumi(ctl.DIN(th_pin))
 
     while True:
         if g_set_event & SET_Control1:
