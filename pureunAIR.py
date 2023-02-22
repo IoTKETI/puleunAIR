@@ -87,7 +87,7 @@ def crt_cin(url, con):
 
     response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
 
-    print(response.headers['X-M2M-RSC'], '-', response.text)
+    # print(response.headers['X-M2M-RSC'], '-', response.text)
 
 
 def get_hotwater(cs):
