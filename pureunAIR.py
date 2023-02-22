@@ -360,7 +360,7 @@ if __name__ == "__main__":
     get_hotwater(cs)
 
     get_temphumi(pin)
-    get_temphumi(ctl.DIN(th_pin))
+    # get_temphumi(ctl.DIN(th_pin))
 
     while True:
         if g_set_event & SET_Control1:
