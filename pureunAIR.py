@@ -161,16 +161,13 @@ def get_temphumi(out_pin):
         if humidity is not None and temperature is not None:
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temperature, humidity))
             if local_mqtt_client is not None:
-                if humidity > 100.0:
+                if temperature < 0.0 or temperature > 100.0:
                     humidity, temperature = dht.read_retry(sensor, out_pin)
-                else:
-                    if temperature < 0.0 or temperature > 30.0:
-                        humidity, temperature = dht.read_retry(sensor, out_pin)
-                    else:
-                        local_mqtt_client.publish('/puleunair/temperature', temperature)
-                        crt_cin("PureunAir/PA1/temp", temperature)
-                        local_mqtt_client.publish('/puleunair/humidity', humidity)
-                        crt_cin("PureunAir/PA1/humi", humidity)
+
+                local_mqtt_client.publish('/puleunair/temperature', temperature)
+                crt_cin("PureunAir/PA1/temp", temperature)
+                local_mqtt_client.publish('/puleunair/humidity', humidity)
+                crt_cin("PureunAir/PA1/humi", humidity)
             else:
                 local_mqtt_client.reconnect()
         else:
@@ -179,7 +176,7 @@ def get_temphumi(out_pin):
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
-    threading.Timer(get_data_interval, get_temphumi, args=[pin]).start()
+    threading.Timer(get_data_interval+0.5, get_temphumi, args=[pin]).start()
 
 
 def set_Control1(val):
