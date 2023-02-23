@@ -40,7 +40,7 @@ device_file = device_folder + '/w1_slave'
 pin = 11
 
 get_hotwater_interval = 2.0
-get_temphumi_interval = 3.0
+get_temphumi_interval = 5.0
 
 g_set_event = 0x00
 
@@ -144,13 +144,15 @@ def get_hotwater():
 # threading.Timer(get_hotwater_interval, get_hotwater, args=[cs]).start()
 
 
-def get_temphumi(out_pin):
+def get_temphumi():
     global get_temphumi_interval
     global temperature
     global humidity
+    global pin
+    global sensor
 
     try:
-        humi, temp = dht.read_retry(sensor, out_pin)
+        humi, temp = dht.read_retry(sensor, pin)
 
         if humi is not None and temp is not None:
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
@@ -165,7 +167,7 @@ def get_temphumi(out_pin):
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
-    threading.Timer(get_temphumi_interval, get_temphumi, args=[out_pin]).start()
+    threading.Timer(get_temphumi_interval, get_temphumi).start()
 
 
 def set_Control1(val):
@@ -392,6 +394,7 @@ def auto():
 #
 #     threading.Timer(2.0, sendStatus).start()
 
+sensor = dht.DHT22
 
 if __name__ == "__main__":
     local_mqtt_client = mqtt.Client()
@@ -425,11 +428,9 @@ if __name__ == "__main__":
 
     # max6675.set_pin(cs, sck, so, 1)
 
-    sensor = dht.DHT22
-
     get_hotwater()
 
-    get_temphumi(pin)
+    get_temphumi()
     # get_temphumi(ctl.DIN(th_pin))
 
     while True:
