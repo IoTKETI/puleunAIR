@@ -40,7 +40,7 @@ device_file = device_folder + '/w1_slave'
 pin = 11
 
 get_hotwater_interval = 2.0
-get_temphumi_interval = 5.0
+get_temphumi_interval = 2.0
 
 g_set_event = 0x00
 
