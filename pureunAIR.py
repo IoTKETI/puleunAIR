@@ -397,11 +397,11 @@ if __name__ == "__main__":
     auto()
     sendStatus()
 
-    max6675.set_pin(cs, sck, so, 1)
+    # max6675.set_pin(cs, sck, so, 1)
 
     sensor = dht.DHT22
 
-    get_hotwater(cs)
+    get_hotwater()
 
     get_temphumi(pin)
     # get_temphumi(ctl.DIN(th_pin))
