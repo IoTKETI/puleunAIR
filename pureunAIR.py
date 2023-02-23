@@ -120,6 +120,7 @@ def get_hotwater():
     if equals_pos != -1:
         temp_string = lines[1][equals_pos + 2:]
         hotwater = float(temp_string) / 1000.0
+        print("Hotwater = {0:0.1f}*C".format(hotwater))
 
     threading.Timer(get_hotwater_interval, get_hotwater).start()
 
