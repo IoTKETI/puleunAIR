@@ -7,7 +7,6 @@ import time
 import json
 import threading
 import requests
-from datetime import datetime
 
 # import max6675
 import os
@@ -121,11 +120,9 @@ def get_hotwater():
     if equals_pos != -1:
         temp_string = lines[1][equals_pos + 2:]
         hotwater = float(temp_string) / 1000.0
-        print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
         print("Hotwater = {0:0.1f}*C".format(hotwater))
 
     threading.Timer(get_hotwater_interval, get_hotwater).start()
-
 
 # try:
 #     temp = max6675.read_temp(cs)
@@ -159,7 +156,6 @@ def get_temphumi():
         humi, temp = dht.read_retry(sensor, pin)
 
         if humi is not None and temp is not None:
-            print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
             if (0.0 <= humi and humi <= 100.0):
                 humidity = humi
@@ -316,7 +312,6 @@ TEMPHUMI_PERIOD = get_temphumi_interval
 hotwater_count = 0
 HOTWATER_PERIOD = get_hotwater_interval
 
-
 def auto():
     global AUTO_val
     global hotwater
@@ -342,11 +337,11 @@ def auto():
         # print("        FAN: > %f%\n", AUTO_val["fan_period"])
         # print("      SPRAY: %d minutes per hour\n", AUTO_val["spray_period"])
 
-        if AUTO_val["fan_period"] < float(humidity):
+        if AUTO_val["fan_period"] < float(humidity) :
             set_Control4(1)
-        elif (AUTO_val["fan_period"] - 5) <= float(humidity) and float(humidity) <= AUTO_val["fan_period"]:
-            set_Control4(1)
-        elif float(humidity) < (AUTO_val["fan_period"] - 5):
+        # elif (AUTO_val["fan_period"]-5) <= float(humidity) and float(humidity) <= AUTO_val["fan_period"]:
+        #     set_Control4(1)
+        elif float(humidity) < (AUTO_val["fan_period"]-5):
             set_Control4(0)
 
         spray_count += 1
@@ -367,9 +362,8 @@ def auto():
 
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
-    elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(
-            AUTO_val["heater_period"]) + 0.4:
-        set_Control1(1)
+    # elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
+    #         set_Control1(1)
     elif float(AUTO_val["heater_period"]) + 0.4 < float(hotwater):
         set_Control1(0)
 
@@ -397,7 +391,6 @@ def auto():
             crt_cin("PureunAir/PA1/hotwater", hotwater)
 
     threading.Timer(1.0, auto).start()
-
 
 #
 # def sendStatus():
@@ -440,7 +433,7 @@ if __name__ == "__main__":
             json.dump(AUTO_val, outfile, indent=4)
 
     auto()
-    #     sendStatus()
+#     sendStatus()
 
     # max6675.set_pin(cs, sck, so, 1)
 
