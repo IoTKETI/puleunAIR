@@ -228,6 +228,7 @@ def auto():
 
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
+        set_Control3(1)
     elif float(hotwater) > float(AUTO_val["heater_period"]) + 0.4:
         set_Control1(0)
 
