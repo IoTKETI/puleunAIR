@@ -158,12 +158,16 @@ def get_temphumi():
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
             if (0.0 <= humi and humi <= 100.0):
                 humidity = humi
+            else:
+                print('Humidity error')
 
             if (-18.0 < temp and temp < 100.0):
                 temperature = temp
+            else:
+                print('Temperature error')
         else:
             print("Read error")
-            time.sleep(1)
+            threading.Timer(1.0, get_temphumi).start()
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
