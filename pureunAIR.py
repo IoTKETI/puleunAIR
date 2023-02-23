@@ -29,7 +29,7 @@ pin = 11
 # Temperature & Humidity Pin
 th_pin = 5
 
-get_data_interval = 2.0
+get_data_interval = 2.5
 
 g_set_event = 0x00
 
@@ -100,13 +100,13 @@ def get_hotwater(cs):
         hotwater = round(temp, 1)
         print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
         if local_mqtt_client is not None:
-            if hotwater < 0.0 or hotwater > 50.0:
+            if hotwater < 0.0 or hotwater > 100.0:
                 temp = max6675.read_temp(cs)
                 hotwater = round(temp, 1)
                 print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
-            else:
-                local_mqtt_client.publish('/puleunair/hotwater', hotwater)
-                crt_cin("PureunAir/PA1/hotwater", hotwater)
+
+            local_mqtt_client.publish('/puleunair/hotwater', hotwater)
+            crt_cin("PureunAir/PA1/hotwater", hotwater)
         else:
             local_mqtt_client.reconnect()
 
