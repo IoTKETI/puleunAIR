@@ -307,6 +307,9 @@ def on_message(client, userdata, _msg):
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
 
+status_count = 0
+STATUS_PERIOD = 2
+
 def auto():
     global AUTO_val
     global hotwater
@@ -315,6 +318,8 @@ def auto():
     global auto_mode
     global spray_count
     global air_count
+    global local_mqtt_client
+    global pub_status_topic
 
     if auto_mode:
         print(" AUTO MODE\n")
@@ -350,18 +355,26 @@ def auto():
     elif float(hotwater) > float(AUTO_val["heater_period"]) + 0.4:
         set_Control1(0)
 
+    status_count += 1
+    status_count %= STATUS_PERIOD
+
+    if status_count == 0:
+        if local_mqtt_client is not None:
+            local_mqtt_client.publish(pub_status_topic, json.dumps(AUTO_val))
+            crt_cin("PureunAir/PA1/status", AUTO_val)
+
     threading.Timer(1.0, auto).start()
 
-
-def sendStatus():
-    global local_mqtt_client
-    global pub_status_topic
-
-    if local_mqtt_client is not None:
-        local_mqtt_client.publish(pub_status_topic, json.dumps(AUTO_val))
-        crt_cin("PureunAir/PA1/status", AUTO_val)
-
-    threading.Timer(2.0, sendStatus).start()
+#
+# def sendStatus():
+#     global local_mqtt_client
+#     global pub_status_topic
+#
+#     if local_mqtt_client is not None:
+#         local_mqtt_client.publish(pub_status_topic, json.dumps(AUTO_val))
+#         crt_cin("PureunAir/PA1/status", AUTO_val)
+#
+#     threading.Timer(2.0, sendStatus).start()
 
 
 if __name__ == "__main__":
@@ -392,7 +405,7 @@ if __name__ == "__main__":
             json.dump(AUTO_val, outfile, indent=4)
 
     auto()
-    sendStatus()
+#     sendStatus()
 
     # max6675.set_pin(cs, sck, so, 1)
 
