@@ -338,8 +338,8 @@ def auto():
 
         if AUTO_val["fan_period"] < float(humidity) :
             set_Control4(1)
-        elif (AUTO_val["fan_period"]-5) <= float(humidity) and float(humidity) <= AUTO_val["fan_period"]:
-            set_Control4(1)
+#         elif (AUTO_val["fan_period"]-5) <= float(humidity) and float(humidity) <= AUTO_val["fan_period"]:
+#             set_Control4(1)
         elif float(humidity) < (AUTO_val["fan_period"]-5):
             set_Control4(0)
 
@@ -361,8 +361,8 @@ def auto():
 
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
-    elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
-            set_Control1(1)
+#     elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
+#             set_Control1(1)
     elif float(AUTO_val["heater_period"])+0.4 < float(hotwater):
         set_Control1(0)
 
