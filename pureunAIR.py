@@ -100,8 +100,13 @@ def get_hotwater(cs):
         hotwater = round(temp, 1)
         print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
         if local_mqtt_client is not None:
-            local_mqtt_client.publish('/puleunair/hotwater', hotwater)
-            crt_cin("PureunAir/PA1/hotwater", hotwater)
+            if hotwater < 0.0 or hotwater > 50.0:
+                temp = max6675.read_temp(cs)
+                hotwater = round(temp, 1)
+                print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
+            else:
+                local_mqtt_client.publish('/puleunair/hotwater', hotwater)
+                crt_cin("PureunAir/PA1/hotwater", hotwater)
         else:
             local_mqtt_client.reconnect()
 
@@ -123,10 +128,16 @@ def get_temphumi(out_pin):
         if humidity is not None and temperature is not None:
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temperature, humidity))
             if local_mqtt_client is not None:
-                local_mqtt_client.publish('/puleunair/temperature', temperature)
-                crt_cin("PureunAir/PA1/temp", temperature)
-                local_mqtt_client.publish('/puleunair/humidity', humidity)
-                crt_cin("PureunAir/PA1/humi", humidity)
+                if humidity > 100.0:
+                    humidity, temperature = dht.read_retry(sensor, out_pin)
+                else:
+                    if temperature < 0.0 or temperature > 30.0:
+                        humidity, temperature = dht.read_retry(sensor, out_pin)
+                    else:
+                        local_mqtt_client.publish('/puleunair/temperature', temperature)
+                        crt_cin("PureunAir/PA1/temp", temperature)
+                        local_mqtt_client.publish('/puleunair/humidity', humidity)
+                        crt_cin("PureunAir/PA1/humi", humidity)
             else:
                 local_mqtt_client.reconnect()
         else:
