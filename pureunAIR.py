@@ -39,7 +39,8 @@ device_file = device_folder + '/w1_slave'
 # Temperature & Humidity Pin
 pin = 11
 
-get_data_interval = 2.0
+get_hotwater_interval = 2.0
+get_temphumi_interval = 3.0
 
 g_set_event = 0x00
 
@@ -108,7 +109,7 @@ def read_temp_raw():
 
 
 def get_hotwater():
-    global get_data_interval
+    global get_hotwater_interval
     global hotwater
 
     lines = read_temp_raw()
@@ -120,7 +121,7 @@ def get_hotwater():
         temp_string = lines[1][equals_pos + 2:]
         hotwater = float(temp_string) / 1000.0
 
-    threading.Timer(get_data_interval, get_hotwater).start()
+    threading.Timer(get_hotwater_interval, get_hotwater).start()
 
 # try:
 #     temp = max6675.read_temp(cs)
@@ -140,11 +141,11 @@ def get_hotwater():
 # except KeyboardInterrupt:
 #     pass
 #
-# threading.Timer(get_data_interval, get_hotwater, args=[cs]).start()
+# threading.Timer(get_hotwater_interval, get_hotwater, args=[cs]).start()
 
 
 def get_temphumi(out_pin):
-    global get_data_interval
+    global get_temphumi_interval
     global temperature
     global humidity
 
@@ -164,7 +165,7 @@ def get_temphumi(out_pin):
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
-    threading.Timer(get_data_interval, get_temphumi, args=[out_pin]).start()
+    threading.Timer(get_temphumi_interval, get_temphumi, args=[out_pin]).start()
 
 
 def set_Control1(val):
@@ -299,10 +300,10 @@ status_count = 0
 STATUS_PERIOD = 2
 
 temphumi_count = 0
-TEMPHUMI_PERIOD = 2
+TEMPHUMI_PERIOD = get_temphumi_interval
 
 hotwater_count = 0
-HOTWATER_PERIOD = 3
+HOTWATER_PERIOD = get_hotwater_interval
 
 def auto():
     global AUTO_val
