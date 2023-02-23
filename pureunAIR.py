@@ -163,7 +163,7 @@ def get_temphumi():
                 temperature = temp
         else:
             print("Read error")
-            time.sleep(1)
+            threading.Timer(1.0, get_temphumi).start()
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
