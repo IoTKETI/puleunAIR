@@ -163,7 +163,7 @@ def get_temphumi():
                 temperature = temp
         else:
             print("Read error")
-            time.sleep(100)
+            time.sleep(1)
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
