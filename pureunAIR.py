@@ -8,7 +8,9 @@ import json
 import threading
 import requests
 
-import max6675
+# import max6675
+import os
+import glob
 import Adafruit_DHT as dht
 import SX1509
 import Control
@@ -20,14 +22,22 @@ pub_status_topic = '/puleunair/status'
 pub_hotwater_topic = "/puleunair/hotwater/res"
 pub_humi_topic = "/puleunair/humi/res"
 
+'''
 # MAX6675
 cs = 18
 sck = 20
 so = 16
-# Humidity
-pin = 11
+'''
+# DS18B20
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-therm')
+
+base_dir = '/sys/bus/w1/devices/'
+device_folder = glob.glob(base_dir + '28-3ca*')[0]
+device_file = device_folder + '/w1_slave'
+
 # Temperature & Humidity Pin
-th_pin = 5
+pin = 11
 
 get_data_interval = 2.0
 
@@ -90,30 +100,53 @@ def crt_cin(url, con):
     # print(response.headers['X-M2M-RSC'], '-', response.text)
 
 
-def get_hotwater(cs):
+def read_temp_raw():
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
+
+
+def get_hotwater():
     global local_mqtt_client
     global get_data_interval
     global hotwater
 
-    try:
-        temp = max6675.read_temp(cs)
-        hotwater = round(temp, 1)
-        print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
+    lines = read_temp_raw()
+    while lines[0].strip()[-3:] != 'YES':
+        time.sleep(0.2)
+        lines = read_temp_raw()
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos + 2:]
+        hotwater = float(temp_string) / 1000.0
         if local_mqtt_client is not None:
-            if hotwater < 0.0 or hotwater > 50.0:
-                temp = max6675.read_temp(cs)
-                hotwater = round(temp, 1)
-                print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
-            else:
-                local_mqtt_client.publish('/puleunair/hotwater', hotwater)
-                crt_cin("PureunAir/PA1/hotwater", hotwater)
+            local_mqtt_client.publish('/puleunair/hotwater', hotwater)
+            crt_cin("PureunAir/PA1/hotwater", hotwater)
         else:
             local_mqtt_client.reconnect()
 
-    except KeyboardInterrupt:
-        pass
+    threading.Timer(get_data_interval, get_hotwater).start()
 
-    threading.Timer(get_data_interval, get_hotwater, args=[cs]).start()
+# try:
+#     temp = max6675.read_temp(cs)
+#     hotwater = round(temp, 1)
+#     print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
+#     if local_mqtt_client is not None:
+#         if hotwater < 0.0 or hotwater > 50.0:
+#             temp = max6675.read_temp(cs)
+#             hotwater = round(temp, 1)
+#             print("Hot Water Temperature = {0:0.1f}*C".format(hotwater))
+#         else:
+#             local_mqtt_client.publish('/puleunair/hotwater', hotwater)
+#             crt_cin("PureunAir/PA1/hotwater", hotwater)
+#     else:
+#         local_mqtt_client.reconnect()
+#
+# except KeyboardInterrupt:
+#     pass
+#
+# threading.Timer(get_data_interval, get_hotwater, args=[cs]).start()
 
 
 def get_temphumi(out_pin):
