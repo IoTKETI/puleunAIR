@@ -425,6 +425,7 @@ if __name__ == "__main__":
         with open('Profile.json', 'r') as user_file:
             AUTO_val = json.loads(user_file.read())
     except Exception as e:
+        AUTO_val["auto"] = 0
         AUTO_val["heater_period"] = 24.0
         AUTO_val["spray_period"] = 10
         AUTO_val["air_period"] = 10
