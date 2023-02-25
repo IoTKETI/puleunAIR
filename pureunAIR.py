@@ -375,16 +375,6 @@ def auto():
         else:
             air_count = 0
 
-        arrAutoHumidity.pop(0)
-        arrAutoHumidity.append(humidity)
-
-        arrAutoHotwater.pop(0)
-        arrAutoHotwater.append(humidity)
-    else:
-        arrAutoHumidity = [0 for i in range(1800)]
-        arrAutoHotwater = [0 for i in range(1800)]
-
-
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
     # elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
