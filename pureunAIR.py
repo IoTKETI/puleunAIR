@@ -413,7 +413,7 @@ def auto():
 
             if auto_mode:
                 arrAutoHotwater.pop(0)
-                arrAutoHotwater.append(humidity)
+                arrAutoHotwater.append(hotwater)
             else:
                 arrAutoHotwater = [0 for i in range(1800)]
 
