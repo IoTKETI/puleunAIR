@@ -180,6 +180,8 @@ def get_temphumi():
 #                 print('Temperature error')
         else:
             print("Read error")
+            humi = humidity
+            temp = temperature
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
