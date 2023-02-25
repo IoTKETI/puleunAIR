@@ -288,6 +288,9 @@ def on_message(client, userdata, _msg):
     global Control5_val
     global AUTO_val
     global auto_mode
+    global local_mqtt_client
+    global arrAutoHotwater
+    global arrAutoHumidity
 
     if _msg.topic == '/puleunair/Control_1/set':
         Control1_val = int(_msg.payload.decode('utf-8'))
