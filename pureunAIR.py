@@ -312,7 +312,7 @@ def on_message(client, userdata, _msg):
     elif _msg.topic == '/puleunair/req/arrAutoHumidity':
         local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrAutoHumidity))
     elif _msg.topic == '/puleunair/req/arrAutoHotwater':
-        local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHumidity))
+        local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHotwater))
     else:
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
