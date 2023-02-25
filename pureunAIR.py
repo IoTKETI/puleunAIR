@@ -151,11 +151,15 @@ def get_hotwater():
 #
 # threading.Timer(get_hotwater_interval, get_hotwater, args=[cs]).start()
 
+pre_humidity = 0
+pre_temperature = 0
 
 def get_temphumi():
     global get_temphumi_interval
     global temperature
+    global pre_temperature
     global humidity
+    global pre_humidity
     global pin
     global sensor
 
@@ -165,12 +169,14 @@ def get_temphumi():
         if humi is not None and temp is not None:
             print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
-            if (0.0 <= humi and humi <= 100.0):
+#             if (0.0 <= humi and humi <= 100.0):
+            if abs(pre_humidity - humidity) < 15:
                 humidity = humi
             else:
                 print('Humidity error')
 
-            if (-18.0 < temp and temp < 100.0):
+#             if (-18.0 < temp and temp < 100.0):
+            if abs(pre_temperature - temperature) < 5:
                 temperature = temp
             else:
                 print('Temperature error')
@@ -188,6 +194,9 @@ def get_temphumi():
     temphumi = str(temperature) + ',' + str(humidity)
     local_mqtt_client.publish('/puleunair/temphumi', temphumi)
     crt_cin("PureunAir/PA1/temp", temphumi)
+
+    pre_humidity = humidity
+    pre_temperature = temperature
 
     threading.Timer(get_temphumi_interval, get_temphumi).start()
 
