@@ -174,27 +174,20 @@ def get_temphumi():
                 temperature = temp
             else:
                 print('Temperature error')
-
-            temphumi = str(temperature) + ',' + str(humidity)
-            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-            crt_cin("PureunAir/PA1/temp", temphumi)
-
-#             if auto_mode:
-#                 arrAutoHumidity.pop(0)
-#                 arrAutoHumidity.append(humidity)
-#             else:
-#                 arrAutoHumidity = [0 for i in range(1800)]
-
-            arrAutoHumidity.pop(0)
-            arrAutoHumidity.append(humidity)
-
-            arrAutoTemperature.pop(0)
-            arrAutoTemperature.append(temperature)
         else:
             print("Read error")
-            threading.Timer(1.0, get_temphumi).start()
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
+
+    arrAutoHumidity.pop(0)
+    arrAutoHumidity.append(humidity)
+
+    arrAutoTemperature.pop(0)
+    arrAutoTemperature.append(temperature)
+
+    temphumi = str(temperature) + ',' + str(humidity)
+    local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+    crt_cin("PureunAir/PA1/temp", temphumi)
 
     threading.Timer(get_temphumi_interval, get_temphumi).start()
 
