@@ -173,6 +173,19 @@ def get_temphumi():
                 temperature = temp
             else:
                 print('Temperature error')
+
+            temphumi = str(temperature) + ',' + str(humidity)
+            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+            crt_cin("PureunAir/PA1/temp", temphumi)
+
+#             if auto_mode:
+#                 arrAutoHumidity.pop(0)
+#                 arrAutoHumidity.append(humidity)
+#             else:
+#                 arrAutoHumidity = [0 for i in range(1800)]
+
+            arrAutoHumidity.pop(0)
+            arrAutoHumidity.append(humidity)
         else:
             print("Read error")
             threading.Timer(1.0, get_temphumi).start()
@@ -398,16 +411,19 @@ def auto():
         temphumi_count += 1
         temphumi_count %= TEMPHUMI_PERIOD
 
-        if temphumi_count == 0:
-            temphumi = str(temperature) + ',' + str(humidity)
-            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-            crt_cin("PureunAir/PA1/temp", temphumi)
-
-            if auto_mode:
-                arrAutoHumidity.pop(0)
-                arrAutoHumidity.append(humidity)
-            else:
-                arrAutoHumidity = [0 for i in range(1800)]
+#         if temphumi_count == 0:
+#             temphumi = str(temperature) + ',' + str(humidity)
+#             local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+#             crt_cin("PureunAir/PA1/temp", temphumi)
+#
+# #             if auto_mode:
+# #                 arrAutoHumidity.pop(0)
+# #                 arrAutoHumidity.append(humidity)
+# #             else:
+# #                 arrAutoHumidity = [0 for i in range(1800)]
+#
+#             arrAutoHumidity.pop(0)
+#             arrAutoHumidity.append(humidity)
 
         hotwater_count += 1
         hotwater_count %= HOTWATER_PERIOD
@@ -416,11 +432,14 @@ def auto():
             local_mqtt_client.publish('/puleunair/hotwater', hotwater)
             crt_cin("PureunAir/PA1/hotwater", hotwater)
 
-            if auto_mode:
-                arrAutoHotwater.pop(0)
-                arrAutoHotwater.append(hotwater)
-            else:
-                arrAutoHotwater = [0 for i in range(1800)]
+#             if auto_mode:
+#                 arrAutoHotwater.pop(0)
+#                 arrAutoHotwater.append(hotwater)
+#             else:
+#                 arrAutoHotwater = [0 for i in range(1800)]
+
+            arrAutoHotwater.pop(0)
+            arrAutoHotwater.append(hotwater)
 
     threading.Timer(1.0, auto).start()
 
