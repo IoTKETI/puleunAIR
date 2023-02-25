@@ -346,6 +346,8 @@ def auto():
     global TEMPHUMI_PERIOD
     global hotwater_count
     global HOTWATER_PERIOD
+    global arrAutoHotwater
+    global arrAutoHumidity
 
     if auto_mode:
         print(" AUTO MODE\n")
