@@ -173,16 +173,6 @@ def get_temphumi():
                 temperature = temp
             else:
                 print('Temperature error')
-
-            temphumi = str(temperature) + ',' + str(humidity)
-            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-            crt_cin("PureunAir/PA1/temp", temphumi)
-
-            if auto_mode:
-                arrAutoHumidity.pop(0)
-                arrAutoHumidity.append(humidity)
-            else:
-                arrAutoHumidity = [0 for i in range(1800)]
         else:
             print("Read error")
             threading.Timer(1.0, get_temphumi).start()
@@ -385,6 +375,16 @@ def auto():
         else:
             air_count = 0
 
+        arrAutoHumidity.pop(0)
+        arrAutoHumidity.append(humidity)
+
+        arrAutoHotwater.pop(0)
+        arrAutoHotwater.append(humidity)
+    else:
+        arrAutoHumidity = [0 for i in range(1800)]
+        arrAutoHotwater = [0 for i in range(1800)]
+
+
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
     # elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
@@ -403,16 +403,16 @@ def auto():
         temphumi_count += 1
         temphumi_count %= TEMPHUMI_PERIOD
 
-#         if temphumi_count == 0:
-#             temphumi = str(temperature) + ',' + str(humidity)
-#             local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-#             crt_cin("PureunAir/PA1/temp", temphumi)
-#
-#             if auto_mode:
-#                 arrAutoHumidity.pop(0)
-#                 arrAutoHumidity.append(humidity)
-#             else:
-#                 arrAutoHumidity = [0 for i in range(1800)]
+        if temphumi_count == 0:
+            temphumi = str(temperature) + ',' + str(humidity)
+            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+            crt_cin("PureunAir/PA1/temp", temphumi)
+
+            if auto_mode:
+                arrAutoHumidity.pop(0)
+                arrAutoHumidity.append(humidity)
+            else:
+                arrAutoHumidity = [0 for i in range(1800)]
 
         hotwater_count += 1
         hotwater_count %= HOTWATER_PERIOD
