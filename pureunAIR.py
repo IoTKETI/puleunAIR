@@ -189,9 +189,9 @@ def get_temphumi():
         bufHumidity.pop(0)
     bufHumidity.append(humi)
 
-    len = len(bufHumidity)
+    length = len(bufHumidity)
     sum = sum(bufHumidity)
-    humidity = sum/len
+    humidity = sum/length
 
     arrAutoHumidity.pop(0)
     arrAutoHumidity.append(humidity)
@@ -200,9 +200,9 @@ def get_temphumi():
         bufTemperature.pop(0)
     bufTemperature.append(temp)
 
-    len = len(bufTemperature)
+    length = len(bufTemperature)
     sum = sum(bufTemperature)
-    temperature = sum/len
+    temperature = sum/length
 
     arrAutoTemperature.pop(0)
     arrAutoTemperature.append(temperature)
