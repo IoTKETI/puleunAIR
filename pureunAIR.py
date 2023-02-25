@@ -81,6 +81,7 @@ air_count = 0
 t_auto = None
 
 arrAutoHumidity = [0 for i in range(1800)]
+arrAutoTemperature = [0 for i in range(1800)]
 arrAutoHotwater = [0 for i in range(1800)]
 
 
@@ -186,6 +187,9 @@ def get_temphumi():
 
             arrAutoHumidity.pop(0)
             arrAutoHumidity.append(humidity)
+
+            arrAutoTemperature.pop(0)
+            arrAutoTemperature.append(temperature)
         else:
             print("Read error")
             threading.Timer(1.0, get_temphumi).start()
@@ -256,6 +260,7 @@ def on_connect(client, userdata, flags, rc):
         local_mqtt_client.subscribe("/puleunair/Control_5/set")
         local_mqtt_client.subscribe("/puleunair/auto/set")
         local_mqtt_client.subscribe("/puleunair/req/arrAutoHumidity")
+        local_mqtt_client.subscribe("/puleunair/req/arrAutoTemperature")
         local_mqtt_client.subscribe("/puleunair/req/arrAutoHotwater")
 
     elif rc == 1:
@@ -304,6 +309,7 @@ def on_message(client, userdata, _msg):
     global local_mqtt_client
     global arrAutoHotwater
     global arrAutoHumidity
+    global arrAutoTemperature
 
     if _msg.topic == '/puleunair/Control_1/set':
         Control1_val = int(_msg.payload.decode('utf-8'))
@@ -327,6 +333,8 @@ def on_message(client, userdata, _msg):
         g_set_event |= SET_AUTO
     elif _msg.topic == '/puleunair/req/arrAutoHumidity':
         local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrAutoHumidity))
+    elif _msg.topic == '/puleunair/req/arrAutoTemperature':
+          local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', str(arrAutoTemperature))
     elif _msg.topic == '/puleunair/req/arrAutoHotwater':
         local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHotwater))
     else:
@@ -360,6 +368,7 @@ def auto():
     global hotwater_count
     global HOTWATER_PERIOD
     global arrAutoHotwater
+    global arrAutoTemperature
     global arrAutoHumidity
 
     if auto_mode:
