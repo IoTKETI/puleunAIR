@@ -153,6 +153,7 @@ def get_hotwater():
 
 bufHumidity = []
 bufTemperature = []
+BUF_SIZE = 4
 
 def get_temphumi():
     global get_temphumi_interval
@@ -162,6 +163,7 @@ def get_temphumi():
     global bufTemperature
     global pin
     global sensor
+    global BUF_SIZE
 
     try:
         humi, temp = dht.read_retry(sensor, pin)
@@ -169,15 +171,17 @@ def get_temphumi():
         if humi is not None and temp is not None:
             print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
-#             if (0.0 <= humi and humi <= 100.0):
-#                 humidity = humi
-#             else:
-#                 print('Humidity error')
-#
-#             if (-18.0 < temp and temp < 100.0):
-#                 temperature = temp
-#             else:
-#                 print('Temperature error')
+            if (0.0 <= humi and humi <= 100.0):
+                humidity = humi
+            else:
+                humi = humidity
+                print('Humidity error')
+
+            if (-18.0 < temp and temp < 100.0):
+                temperature = temp
+            else:
+                temp = temperature
+                print('Temperature error')
         else:
             print("Read error")
             humi = humidity
@@ -185,7 +189,7 @@ def get_temphumi():
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
-    if(len(bufHumidity) >= 8):
+    if(len(bufHumidity) >= BUF_SIZE):
         bufHumidity.pop(0)
     bufHumidity.append(humi)
 
@@ -196,7 +200,7 @@ def get_temphumi():
     arrAutoHumidity.pop(0)
     arrAutoHumidity.append(humidity)
 
-    if(len(bufTemperature) >= 8):
+    if(len(bufTemperature) >= BUF_SIZE):
         bufTemperature.pop(0)
     bufTemperature.append(temp)
 
