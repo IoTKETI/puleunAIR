@@ -80,6 +80,9 @@ air_count = 0
 
 t_auto = None
 
+arrAutoHumidity = [0 for i in range(1800)]
+arrAutoHotwater = [0 for i in range(1800)]
+
 
 def crt_cin(url, con):
     global HOST
@@ -239,6 +242,9 @@ def on_connect(client, userdata, flags, rc):
         local_mqtt_client.subscribe("/puleunair/Control_4/set")
         local_mqtt_client.subscribe("/puleunair/Control_5/set")
         local_mqtt_client.subscribe("/puleunair/auto/set")
+        local_mqtt_client.subscribe("/puleunair/req/arrAutoHumidity")
+        local_mqtt_client.subscribe("/puleunair/req/arrAutoHotwater")
+
     elif rc == 1:
         print("incorrect protocol version")
         local_mqtt_client.reconnect()
@@ -303,6 +309,10 @@ def on_message(client, userdata, _msg):
         for key in recv_auto_val.keys():
             AUTO_val[key] = recv_auto_val[key]
         g_set_event |= SET_AUTO
+    elif _msg.topic == '/puleunair/req/arrAutoHumidity':
+        local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrAutoHumidity))
+    elif _msg.topic == '/puleunair/req/arrAutoHotwater':
+        local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHumidity))
     else:
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
@@ -365,6 +375,16 @@ def auto():
         else:
             air_count = 0
 
+        arrAutoHumidity.pop(0)
+        arrAutoHumidity.append(humidity)
+
+        arrAutoHotwater.pop(0)
+        arrAutoHotwater.append(humidity)
+    else:
+        arrAutoHumidity = [0 for i in range(1800)]
+        arrAutoHotwater = [0 for i in range(1800)]
+
+
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
     # elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
@@ -388,12 +408,24 @@ def auto():
             local_mqtt_client.publish('/puleunair/temphumi', temphumi)
             crt_cin("PureunAir/PA1/temp", temphumi)
 
+            if auto_mode:
+                arrAutoHumidity.pop(0)
+                arrAutoHumidity.append(humidity)
+            else:
+                arrAutoHumidity = [0 for i in range(1800)]
+
         hotwater_count += 1
         hotwater_count %= HOTWATER_PERIOD
 
         if hotwater_count == 0:
             local_mqtt_client.publish('/puleunair/hotwater', hotwater)
             crt_cin("PureunAir/PA1/hotwater", hotwater)
+
+            if auto_mode:
+                arrAutoHotwater.pop(0)
+                arrAutoHotwater.append(humidity)
+            else:
+                arrAutoHotwater = [0 for i in range(1800)]
 
     threading.Timer(1.0, auto).start()
 
