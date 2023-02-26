@@ -197,9 +197,6 @@ def get_temphumi():
     summation = sum(bufHumidity)
     humidity = summation/length
 
-    arrAutoHumidity.pop(0)
-    arrAutoHumidity.append(humidity)
-
     if(len(bufTemperature) >= BUF_SIZE):
         bufTemperature.pop(0)
     bufTemperature.append(temp)
@@ -208,12 +205,15 @@ def get_temphumi():
     summation = sum(bufTemperature)
     temperature = summation/length
 
-    arrAutoTemperature.pop(0)
-    arrAutoTemperature.append(temperature)
-
-    temphumi = str(temperature) + ',' + str(humidity)
-    local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-    crt_cin("PureunAir/PA1/temp", temphumi)
+#     arrAutoHumidity.pop(0)
+#     arrAutoHumidity.append(humidity)
+#
+#     arrAutoTemperature.pop(0)
+#     arrAutoTemperature.append(temperature)
+#
+#     temphumi = str(temperature) + ',' + str(humidity)
+#     local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+#     crt_cin("PureunAir/PA1/temp", temphumi)
 
     threading.Timer(get_temphumi_interval, get_temphumi).start()
 
@@ -438,33 +438,22 @@ def auto():
 
         temphumi_count += 1
         temphumi_count %= TEMPHUMI_PERIOD
+        if temphumi_count == 0:
+            temphumi = str(temperature) + ',' + str(humidity)
+            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+            crt_cin("PureunAir/PA1/temp", temphumi)
 
-#         if temphumi_count == 0:
-#             temphumi = str(temperature) + ',' + str(humidity)
-#             local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-#             crt_cin("PureunAir/PA1/temp", temphumi)
-#
-# #             if auto_mode:
-# #                 arrAutoHumidity.pop(0)
-# #                 arrAutoHumidity.append(humidity)
-# #             else:
-# #                 arrAutoHumidity = [0 for i in range(1800)]
-#
-#             arrAutoHumidity.pop(0)
-#             arrAutoHumidity.append(humidity)
+            arrAutoHumidity.pop(0)
+            arrAutoHumidity.append(humidity)
+
+            arrAutoTemperature.pop(0)
+            arrAutoTemperature.append(temperature)
 
         hotwater_count += 1
         hotwater_count %= HOTWATER_PERIOD
-
         if hotwater_count == 0:
             local_mqtt_client.publish('/puleunair/hotwater', hotwater)
             crt_cin("PureunAir/PA1/hotwater", hotwater)
-
-#             if auto_mode:
-#                 arrAutoHotwater.pop(0)
-#                 arrAutoHotwater.append(hotwater)
-#             else:
-#                 arrAutoHotwater = [0 for i in range(1800)]
 
             arrAutoHotwater.pop(0)
             arrAutoHotwater.append(hotwater)
