@@ -80,9 +80,10 @@ air_count = 0
 
 t_auto = None
 
-arrAutoHumidity = [0 for i in range(1800)]
-arrAutoTemperature = [0 for i in range(1800)]
-arrAutoHotwater = [0 for i in range(1800)]
+AUTO_BUFF_SIZE = 3600
+arrAutoHumidity = [0 for i in range(AUTO_BUFF_SIZE)]
+arrAutoTemperature = [0 for i in range(AUTO_BUFF_SIZE)]
+arrAutoHotwater = [0 for i in range(AUTO_BUFF_SIZE)]
 
 
 def crt_cin(url, con):
