@@ -119,17 +119,29 @@ def get_hotwater():
     global hotwater
 
     lines = read_temp_raw()
+    count = 0
     while lines[0].strip()[-3:] != 'YES':
-        time.sleep(0.2)
+        for i in range(1000):
+            pass
+        count += 1
+        if count > 10:
+            break
         lines = read_temp_raw()
-    equals_pos = lines[1].find('t=')
-    if equals_pos != -1:
-        temp_string = lines[1][equals_pos + 2:]
-        hotwater = float(temp_string) / 1000.0
-        print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
-        print("Hotwater = {0:0.1f}*C".format(hotwater))
 
-    threading.Timer(get_hotwater_interval, get_hotwater).start()
+    if count > 0:
+        print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
+        print("Hotwater Error")
+
+        threading.Timer(get_hotwater_interval, get_hotwater).start()
+    else:
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos + 2:]
+            hotwater = float(temp_string) / 1000.0
+            print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
+            print("Hotwater = {0:0.1f}*C".format(hotwater))
+
+        threading.Timer(get_hotwater_interval, get_hotwater).start()
 
 
 # try:
@@ -155,6 +167,7 @@ def get_hotwater():
 bufHumidity = []
 bufTemperature = []
 BUF_SIZE = 4
+
 
 def get_temphumi():
     global get_temphumi_interval
@@ -190,31 +203,31 @@ def get_temphumi():
     except KeyboardInterrupt:
         print("Terminated by Keyboard")
 
-    if(len(bufHumidity) >= BUF_SIZE):
+    if (len(bufHumidity) >= BUF_SIZE):
         bufHumidity.pop(0)
     bufHumidity.append(humi)
 
     length = len(bufHumidity)
     summation = sum(bufHumidity)
-    humidity = summation/length
+    humidity = summation / length
 
-    if(len(bufTemperature) >= BUF_SIZE):
+    if (len(bufTemperature) >= BUF_SIZE):
         bufTemperature.pop(0)
     bufTemperature.append(temp)
 
     length = len(bufTemperature)
     summation = sum(bufTemperature)
-    temperature = summation/length
+    temperature = summation / length
 
-#     arrAutoHumidity.pop(0)
-#     arrAutoHumidity.append(humidity)
-#
-#     arrAutoTemperature.pop(0)
-#     arrAutoTemperature.append(temperature)
-#
-#     temphumi = str(temperature) + ',' + str(humidity)
-#     local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-#     crt_cin("PureunAir/PA1/temp", temphumi)
+    #     arrAutoHumidity.pop(0)
+    #     arrAutoHumidity.append(humidity)
+    #
+    #     arrAutoTemperature.pop(0)
+    #     arrAutoTemperature.append(temperature)
+    #
+    #     temphumi = str(temperature) + ',' + str(humidity)
+    #     local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+    #     crt_cin("PureunAir/PA1/temp", temphumi)
 
     threading.Timer(get_temphumi_interval, get_temphumi).start()
 
@@ -354,7 +367,7 @@ def on_message(client, userdata, _msg):
     elif _msg.topic == '/puleunair/req/arrAutoHumidity':
         local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrAutoHumidity))
     elif _msg.topic == '/puleunair/req/arrAutoTemperature':
-          local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', str(arrAutoTemperature))
+        local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', str(arrAutoTemperature))
     elif _msg.topic == '/puleunair/req/arrAutoHotwater':
         local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHotwater))
     else:
