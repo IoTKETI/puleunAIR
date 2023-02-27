@@ -85,6 +85,7 @@ arrAutoHumidity = [0 for i in range(AUTO_BUFF_SIZE)]
 arrAutoTemperature = [0 for i in range(AUTO_BUFF_SIZE)]
 arrAutoHotwater = [0 for i in range(AUTO_BUFF_SIZE)]
 arrAutoHeater = [0 for i in range(AUTO_BUFF_SIZE)]
+arrAutoFan = [0 for i in range(AUTO_BUFF_SIZE)]
 
 
 def crt_cin(url, con):
@@ -297,6 +298,7 @@ def on_connect(client, userdata, flags, rc):
         local_mqtt_client.subscribe("/puleunair/req/arrAutoTemperature")
         local_mqtt_client.subscribe("/puleunair/req/arrAutoHotwater")
         local_mqtt_client.subscribe("/puleunair/req/arrAutoHeater")
+        local_mqtt_client.subscribe("/puleunair/req/arrAutoFan")
 
     elif rc == 1:
         print("incorrect protocol version")
@@ -344,6 +346,7 @@ def on_message(client, userdata, _msg):
     global local_mqtt_client
     global arrAutoHotwater
     global arrAutoHeater
+    global arrAutoFan
     global arrAutoHumidity
     global arrAutoTemperature
 
@@ -375,6 +378,8 @@ def on_message(client, userdata, _msg):
         local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHotwater))
     elif _msg.topic == '/puleunair/req/arrAutoHeater':
         local_mqtt_client.publish('/puleunair/res/arrAutoHeater', str(arrAutoHeater))
+    elif _msg.topic == '/puleunair/req/arrAutoFan':
+        local_mqtt_client.publish('/puleunair/res/arrAutoFan', str(arrAutoFan))
     else:
         print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
 
@@ -407,6 +412,7 @@ def auto():
     global HOTWATER_PERIOD
     global arrAutoHotwater
     global arrAutoHeater
+    global arrAutoFan
     global arrAutoTemperature
     global arrAutoHumidity
 
@@ -458,6 +464,9 @@ def auto():
 
             arrAutoHeater.pop(0)
             arrAutoHeater.append(AUTO_val["ctrl1"])
+            
+            arrAutoFan.pop(0)
+            arrAutoFan.append(AUTO_val["ctrl4"])
 
         temphumi_count += 1
         temphumi_count %= TEMPHUMI_PERIOD
