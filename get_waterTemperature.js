@@ -51,7 +51,7 @@ let arrHotwater = Array(SAMPLES).fill(0);
 
 let sensingWaterTemperature = () => {
     const tempC = sensor.readSimpleC(1);
-    if(!tempC) {
+    if(tempC) {
         console.log('Water Temperature: ' + `${tempC} degC`);
 
         if(local_mqtt_client) {
