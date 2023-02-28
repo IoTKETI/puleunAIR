@@ -33,7 +33,7 @@ function local_mqtt_connect(serverip) {
 
         local_mqtt_client.on('message', (topic, message) => {
             if (topic === '/puleunair/req/arrAutoHotwater') {
-                local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrHotwater));
+                local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', arrHotwater.toString());
             }
         });
 
