@@ -34,10 +34,10 @@ function local_mqtt_connect(serverip) {
 
         local_mqtt_client.on('message', (topic, message) => {
             if (topic === '/puleunair/req/arrAutoTemperature') {
-                local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', str(arrTemperature));
+                local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', arrTemperature.toString());
             }
             else if (topic === '/puleunair/req/arrAutoHumidity') {
-                local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrHumidity));
+                local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', arrHumidity.toString());
             }
         });
 
