@@ -51,14 +51,16 @@ let arrHotwater = Array(SAMPLES).fill(0);
 
 let sensingWaterTemperature = () => {
     const tempC = sensor.readSimpleC(1);
-    console.log('Water Temperature: ' + `${tempC} degC`);
+    if(!tempC) {
+        console.log('Water Temperature: ' + `${tempC} degC`);
 
-    if(local_mqtt_client) {
-        local_mqtt_client.publish('/puleunair/hotwater', tempC.toString());
-        crtci('PA1/hotwater', tempC.toString());
+        if(local_mqtt_client) {
+            local_mqtt_client.publish('/puleunair/hotwater', tempC.toString());
+            crtci('PA1/hotwater', tempC.toString());
 
-        arrHotwater.shift();
-        arrHotwater.push(parseFloat(tempC));
+            arrHotwater.shift();
+            arrHotwater.push(parseFloat(tempC));
+        }
     }
 
     setTimeout(sensingWaterTemperature, 2000);
