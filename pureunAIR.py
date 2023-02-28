@@ -20,8 +20,8 @@ HOST = '121.137.228.240'
 
 local_mqtt_client = None
 pub_status_topic = '/puleunair/status'
-pub_hotwater_topic = "/puleunair/hotwater/res"
-pub_humi_topic = "/puleunair/humi/res"
+# pub_hotwater_topic = "/puleunair/hotwater/res"
+# pub_humi_topic = "/puleunair/humi/res"
 
 '''
 # MAX6675
@@ -30,18 +30,18 @@ sck = 20
 so = 16
 '''
 # DS18B20
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-therm')
-
-base_dir = '/sys/bus/w1/devices/'
-device_folder = glob.glob(base_dir + '28-3ca*')[0]
-device_file = device_folder + '/w1_slave'
+# os.system('modprobe w1-gpio')
+# os.system('modprobe w1-therm')
+#
+# base_dir = '/sys/bus/w1/devices/'
+# device_folder = glob.glob(base_dir + '28-3ca*')[0]
+# device_file = device_folder + '/w1_slave'
 
 # Temperature & Humidity Pin
-pin = 11
+# pin = 11
 
-get_hotwater_interval = 2.0
-get_temphumi_interval = 2.0
+# get_hotwater_interval = 2.0
+# get_temphumi_interval = 2.0
 
 g_set_event = 0x00
 
@@ -71,7 +71,7 @@ sx = SX1509.SX1509(i2c_addr, i2c_bus)
 ctl = Control.Control(sx)
 
 hotwater = 0.0
-temperature = 0.0
+# temperature = 0.0
 humidity = 0.0
 
 auto_mode = False
@@ -81,9 +81,9 @@ air_count = 0
 t_auto = None
 
 AUTO_BUFF_SIZE = 3600
-arrAutoHumidity = [0 for i in range(AUTO_BUFF_SIZE)]
-arrAutoTemperature = [0 for i in range(AUTO_BUFF_SIZE)]
-arrAutoHotwater = [0 for i in range(AUTO_BUFF_SIZE)]
+# arrAutoHumidity = [0 for i in range(AUTO_BUFF_SIZE)]
+# arrAutoTemperature = [0 for i in range(AUTO_BUFF_SIZE)]
+# arrAutoHotwater = [0 for i in range(AUTO_BUFF_SIZE)]
 arrAutoHeater = [0 for i in range(AUTO_BUFF_SIZE)]
 arrAutoFan = [0 for i in range(AUTO_BUFF_SIZE)]
 
@@ -109,41 +109,41 @@ def crt_cin(url, con):
     # print(response.headers['X-M2M-RSC'], '-', response.text)
 
 
-def read_temp_raw():
-    f = open(device_file, 'r')
-    lines = f.readlines()
-    f.close()
-    return lines
+# def read_temp_raw():
+#     f = open(device_file, 'r')
+#     lines = f.readlines()
+#     f.close()
+#     return lines
 
 
-def get_hotwater():
-    global get_hotwater_interval
-    global hotwater
-
-    lines = read_temp_raw()
-    count = 0
-    while lines[0].strip()[-3:] != 'YES':
-        for i in range(1000):
-            pass
-        count += 1
-        if count > 10:
-            break
-        lines = read_temp_raw()
-
-    if count > 0:
-        print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
-        print("Hotwater Error")
-
-        threading.Timer(get_hotwater_interval, get_hotwater).start()
-    else:
-        equals_pos = lines[1].find('t=')
-        if equals_pos != -1:
-            temp_string = lines[1][equals_pos + 2:]
-            hotwater = float(temp_string) / 1000.0
-            print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
-            print("Hotwater = {0:0.1f}*C".format(hotwater))
-
-        threading.Timer(get_hotwater_interval, get_hotwater).start()
+# def get_hotwater():
+#     global get_hotwater_interval
+#     global hotwater
+#
+#     lines = read_temp_raw()
+#     count = 0
+#     while lines[0].strip()[-3:] != 'YES':
+#         for i in range(1000):
+#             pass
+#         count += 1
+#         if count > 10:
+#             break
+#         lines = read_temp_raw()
+#
+#     if count > 0:
+#         print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
+#         print("Hotwater Error")
+#
+#         threading.Timer(get_hotwater_interval, get_hotwater).start()
+#     else:
+#         equals_pos = lines[1].find('t=')
+#         if equals_pos != -1:
+#             temp_string = lines[1][equals_pos + 2:]
+#             hotwater = float(temp_string) / 1000.0
+#             print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
+#             print("Hotwater = {0:0.1f}*C".format(hotwater))
+#
+#         threading.Timer(get_hotwater_interval, get_hotwater).start()
 
 
 # try:
@@ -166,72 +166,72 @@ def get_hotwater():
 #
 # threading.Timer(get_hotwater_interval, get_hotwater, args=[cs]).start()
 
-bufHumidity = []
-bufTemperature = []
-BUF_SIZE = 4
-
-
-def get_temphumi():
-    global get_temphumi_interval
-    global temperature
-    global humidity
-    global bufHumidity
-    global bufTemperature
-    global pin
-    global sensor
-    global BUF_SIZE
-
-    try:
-        humi, temp = dht.read_retry(sensor, pin)
-
-        if humi is not None and temp is not None:
-            print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
-            print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
-            if (0.0 <= humi and humi <= 100.0):
-                humidity = humi
-            else:
-                humi = humidity
-                print('Humidity error')
-
-            if (-18.0 < temp and temp < 100.0):
-                temperature = temp
-            else:
-                temp = temperature
-                print('Temperature error')
-        else:
-            print("Read error")
-            humi = humidity
-            temp = temperature
-    except KeyboardInterrupt:
-        print("Terminated by Keyboard")
-
-    if (len(bufHumidity) >= BUF_SIZE):
-        bufHumidity.pop(0)
-    bufHumidity.append(humi)
-
-    length = len(bufHumidity)
-    summation = sum(bufHumidity)
-    humidity = summation / length
-
-    if (len(bufTemperature) >= BUF_SIZE):
-        bufTemperature.pop(0)
-    bufTemperature.append(temp)
-
-    length = len(bufTemperature)
-    summation = sum(bufTemperature)
-    temperature = summation / length
-
-    #     arrAutoHumidity.pop(0)
-    #     arrAutoHumidity.append(humidity)
-    #
-    #     arrAutoTemperature.pop(0)
-    #     arrAutoTemperature.append(temperature)
-    #
-    #     temphumi = str(temperature) + ',' + str(humidity)
-    #     local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-    #     crt_cin("PureunAir/PA1/temp", temphumi)
-
-    threading.Timer(get_temphumi_interval, get_temphumi).start()
+# bufHumidity = []
+# bufTemperature = []
+# BUF_SIZE = 4
+#
+#
+# def get_temphumi():
+#     global get_temphumi_interval
+#     global temperature
+#     global humidity
+#     global bufHumidity
+#     global bufTemperature
+#     global pin
+#     global sensor
+#     global BUF_SIZE
+#
+#     try:
+#         humi, temp = dht.read_retry(sensor, pin)
+#
+#         if humi is not None and temp is not None:
+#             print(datetime.now().strftime('%Y.%m.%d - %H:%M:%S'))
+#             print("Temperature = {0:0.1f}*C Humidity = {1:0.1f}%".format(temp, humi))
+#             if (0.0 <= humi and humi <= 100.0):
+#                 humidity = humi
+#             else:
+#                 humi = humidity
+#                 print('Humidity error')
+#
+#             if (-18.0 < temp and temp < 100.0):
+#                 temperature = temp
+#             else:
+#                 temp = temperature
+#                 print('Temperature error')
+#         else:
+#             print("Read error")
+#             humi = humidity
+#             temp = temperature
+#     except KeyboardInterrupt:
+#         print("Terminated by Keyboard")
+#
+#     if (len(bufHumidity) >= BUF_SIZE):
+#         bufHumidity.pop(0)
+#     bufHumidity.append(humi)
+#
+#     length = len(bufHumidity)
+#     summation = sum(bufHumidity)
+#     humidity = summation / length
+#
+#     if (len(bufTemperature) >= BUF_SIZE):
+#         bufTemperature.pop(0)
+#     bufTemperature.append(temp)
+#
+#     length = len(bufTemperature)
+#     summation = sum(bufTemperature)
+#     temperature = summation / length
+#
+#     #     arrAutoHumidity.pop(0)
+#     #     arrAutoHumidity.append(humidity)
+#     #
+#     #     arrAutoTemperature.pop(0)
+#     #     arrAutoTemperature.append(temperature)
+#     #
+#     #     temphumi = str(temperature) + ',' + str(humidity)
+#     #     local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+#     #     crt_cin("PureunAir/PA1/temp", temphumi)
+#
+#     threading.Timer(get_temphumi_interval, get_temphumi).start()
 
 
 def set_Control1(val):
@@ -288,15 +288,19 @@ def on_connect(client, userdata, flags, rc):
 
     if rc == 0:
         print('[local_mqtt_client_connect] connect to ' + HOST)
+
+        local_mqtt_client.subscribe("/puleunair/hotwater")
+        local_mqtt_client.subscribe("/puleunair/temphumi")
+
         local_mqtt_client.subscribe("/puleunair/Control_1/set")
         local_mqtt_client.subscribe("/puleunair/Control_2/set")
         local_mqtt_client.subscribe("/puleunair/Control_3/set")
         local_mqtt_client.subscribe("/puleunair/Control_4/set")
         local_mqtt_client.subscribe("/puleunair/Control_5/set")
         local_mqtt_client.subscribe("/puleunair/auto/set")
-        local_mqtt_client.subscribe("/puleunair/req/arrAutoHumidity")
-        local_mqtt_client.subscribe("/puleunair/req/arrAutoTemperature")
-        local_mqtt_client.subscribe("/puleunair/req/arrAutoHotwater")
+#         local_mqtt_client.subscribe("/puleunair/req/arrAutoHumidity")
+#         local_mqtt_client.subscribe("/puleunair/req/arrAutoTemperature")
+#         local_mqtt_client.subscribe("/puleunair/req/arrAutoHotwater")
         local_mqtt_client.subscribe("/puleunair/req/arrAutoHeater")
         local_mqtt_client.subscribe("/puleunair/req/arrAutoFan")
 
@@ -344,13 +348,19 @@ def on_message(client, userdata, _msg):
     global AUTO_val
     global auto_mode
     global local_mqtt_client
-    global arrAutoHotwater
+#     global arrAutoHotwater
     global arrAutoHeater
     global arrAutoFan
-    global arrAutoHumidity
-    global arrAutoTemperature
+#     global arrAutoHumidity
+#     global arrAutoTemperature
 
-    if _msg.topic == '/puleunair/Control_1/set':
+    if _msg.topic == '/puleunair/hotwater':
+        hotwater = float(_msg.payload.decode('utf-8'))
+    elif _msg.topic == '/puleunair/temphumi':
+        strVal = _msg.payload.decode('utf-8')
+        arrVal = strVal.split(',')
+        humidity = float(arrVal[1])
+    elif _msg.topic == '/puleunair/Control_1/set':
         Control1_val = int(_msg.payload.decode('utf-8'))
         g_set_event |= SET_Control1
     elif _msg.topic == '/puleunair/Control_2/set':
@@ -370,12 +380,12 @@ def on_message(client, userdata, _msg):
         for key in recv_auto_val.keys():
             AUTO_val[key] = recv_auto_val[key]
         g_set_event |= SET_AUTO
-    elif _msg.topic == '/puleunair/req/arrAutoHumidity':
-        local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrAutoHumidity))
-    elif _msg.topic == '/puleunair/req/arrAutoTemperature':
-        local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', str(arrAutoTemperature))
-    elif _msg.topic == '/puleunair/req/arrAutoHotwater':
-        local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHotwater))
+#     elif _msg.topic == '/puleunair/req/arrAutoHumidity':
+#         local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', str(arrAutoHumidity))
+#     elif _msg.topic == '/puleunair/req/arrAutoTemperature':
+#         local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', str(arrAutoTemperature))
+#     elif _msg.topic == '/puleunair/req/arrAutoHotwater':
+#         local_mqtt_client.publish('/puleunair/res/arrAutoHotwater', str(arrAutoHotwater))
     elif _msg.topic == '/puleunair/req/arrAutoHeater':
         local_mqtt_client.publish('/puleunair/res/arrAutoHeater', str(arrAutoHeater))
     elif _msg.topic == '/puleunair/req/arrAutoFan':
@@ -387,17 +397,17 @@ def on_message(client, userdata, _msg):
 status_count = 0
 STATUS_PERIOD = 2
 
-temphumi_count = 0
-TEMPHUMI_PERIOD = get_temphumi_interval
+# temphumi_count = 0
+# TEMPHUMI_PERIOD = get_temphumi_interval
 
-hotwater_count = 0
-HOTWATER_PERIOD = get_hotwater_interval
+# hotwater_count = 0
+# HOTWATER_PERIOD = get_hotwater_interval
 
 
 def auto():
     global AUTO_val
     global hotwater
-    global temperature
+#     global temperature
     global humidity
     global auto_mode
     global spray_count
@@ -406,15 +416,15 @@ def auto():
     global pub_status_topic
     global status_count
     global STATUS_PERIOD
-    global temphumi_count
-    global TEMPHUMI_PERIOD
-    global hotwater_count
-    global HOTWATER_PERIOD
-    global arrAutoHotwater
+#     global temphumi_count
+#     global TEMPHUMI_PERIOD
+#     global hotwater_count
+#     global HOTWATER_PERIOD
+#     global arrAutoHotwater
     global arrAutoHeater
     global arrAutoFan
-    global arrAutoTemperature
-    global arrAutoHumidity
+#     global arrAutoTemperature
+#     global arrAutoHumidity
 
     if auto_mode:
         print(" AUTO MODE\n")
@@ -426,8 +436,6 @@ def auto():
 
         if AUTO_val["fan_period"] < float(humidity):
             set_Control4(1)
-        # elif (AUTO_val["fan_period"]-5) <= float(humidity) and float(humidity) <= AUTO_val["fan_period"]:
-        #     set_Control4(1)
         elif float(humidity) < (AUTO_val["fan_period"] - 5):
             set_Control4(0)
 
@@ -449,8 +457,6 @@ def auto():
 
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
-    # elif float(AUTO_val["heater_period"]) <= float(hotwater) and float(hotwater) <= float(AUTO_val["heater_period"])+0.4:
-    #         set_Control1(1)
     elif float(AUTO_val["heater_period"]) + 0.4 < float(hotwater):
         set_Control1(0)
 
@@ -468,27 +474,27 @@ def auto():
             arrAutoFan.pop(0)
             arrAutoFan.append(AUTO_val["ctrl4"])
 
-        temphumi_count += 1
-        temphumi_count %= TEMPHUMI_PERIOD
-        if temphumi_count == 0:
-            temphumi = str(temperature) + ',' + str(humidity)
-            local_mqtt_client.publish('/puleunair/temphumi', temphumi)
-            crt_cin("PureunAir/PA1/temp", temphumi)
+#         temphumi_count += 1
+#         temphumi_count %= TEMPHUMI_PERIOD
+#         if temphumi_count == 0:
+#             temphumi = str(temperature) + ',' + str(humidity)
+#             local_mqtt_client.publish('/puleunair/temphumi', temphumi)
+#             crt_cin("PureunAir/PA1/temp", temphumi)
+#
+#             arrAutoHumidity.pop(0)
+#             arrAutoHumidity.append(humidity)
+#
+#             arrAutoTemperature.pop(0)
+#             arrAutoTemperature.append(temperature)
 
-            arrAutoHumidity.pop(0)
-            arrAutoHumidity.append(humidity)
-
-            arrAutoTemperature.pop(0)
-            arrAutoTemperature.append(temperature)
-
-        hotwater_count += 1
-        hotwater_count %= HOTWATER_PERIOD
-        if hotwater_count == 0:
-            local_mqtt_client.publish('/puleunair/hotwater', hotwater)
-            crt_cin("PureunAir/PA1/hotwater", hotwater)
-
-            arrAutoHotwater.pop(0)
-            arrAutoHotwater.append(hotwater)
+#         hotwater_count += 1
+#         hotwater_count %= HOTWATER_PERIOD
+#         if hotwater_count == 0:
+#             local_mqtt_client.publish('/puleunair/hotwater', hotwater)
+#             crt_cin("PureunAir/PA1/hotwater", hotwater)
+#
+#             arrAutoHotwater.pop(0)
+#             arrAutoHotwater.append(hotwater)
 
     threading.Timer(1.0, auto).start()
 
@@ -504,7 +510,7 @@ def auto():
 #
 #     threading.Timer(2.0, sendStatus).start()
 
-sensor = dht.DHT22
+# sensor = dht.DHT22
 
 if __name__ == "__main__":
     local_mqtt_client = mqtt.Client()
@@ -539,9 +545,9 @@ if __name__ == "__main__":
 
     # max6675.set_pin(cs, sck, so, 1)
 
-    get_hotwater()
+#     get_hotwater()
 
-    get_temphumi()
+#     get_temphumi()
     # get_temphumi(ctl.DIN(th_pin))
 
     while True:
