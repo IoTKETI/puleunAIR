@@ -75,11 +75,12 @@ let sensingWaterTemperature = () => {
         }
     }
 
-
-    setTimeout(sensingWaterTemperature, 2000);
+    //setTimeout(sensingWaterTemperature, 2000);
 }
 
-sensingWaterTemperature();
+//sensingWaterTemperature();
+
+setInterval(sensingWaterTemperature, 2000);
 
 function crtci(url, con) {
     let data = {};

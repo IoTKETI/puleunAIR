@@ -85,12 +85,14 @@ let sensingTempHumi = () => {
             }
         }
 
-        setTimeout(sensingTempHumi, 2000);
+        //setTimeout(sensingTempHumi, 2000);
     });
 
 }
 
-sensingTempHumi();
+//sensingTempHumi();
+
+setInterval(sensingTempHumi, 2000);
 
 function crtci(url, con) {
     let data = {};
