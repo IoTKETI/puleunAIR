@@ -1,7 +1,7 @@
-
 const sensor = require("node-dht-sensor");
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
+const axios = require('axios');
 
 let local_mqtt_client = null;
 
@@ -35,8 +35,7 @@ function local_mqtt_connect(serverip) {
         local_mqtt_client.on('message', (topic, message) => {
             if (topic === '/puleunair/req/arrAutoTemperature') {
                 local_mqtt_client.publish('/puleunair/res/arrAutoTemperature', JSON.stringify(arrTemperature));
-            }
-            else if (topic === '/puleunair/req/arrAutoHumidity') {
+            } else if (topic === '/puleunair/req/arrAutoHumidity') {
                 local_mqtt_client.publish('/puleunair/res/arrAutoHumidity', JSON.stringify(arrHumidity));
             }
         });
@@ -54,13 +53,15 @@ let arrTemperature = Array(SAMPLES).fill(0);
 let arrHumidity = Array(SAMPLES).fill(0);
 
 let sensingTempHumi = () => {
-    sensor.read(22, 11, function(err, temperature, humidity) {
+    sensor.read(22, 11, function (err, temperature, humidity) {
         if (!err) {
             console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
 
-            if(local_mqtt_client) {
-                local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString()+','+humidity.toString()));
-//TODO: cin 생성
+            if (local_mqtt_client) {
+                local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString()));
+
+                crtci('PA1/temphumi', temperature.toString() + ',' + humidity.toString());
+
                 arrTemperature.shift();
                 arrTemperature.push(parseFloat(temperature));
 
@@ -75,3 +76,30 @@ let sensingTempHumi = () => {
 }
 
 sensingTempHumi();
+
+function crtci(url, con) {
+    let data = {};
+    data["m2m:cin"] = {};
+    data["m2m:cin"].con = con;
+
+    let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'http://121.137.228.240:7579/Mobius/PureunAir/' + url,
+        headers: {
+            'Accept': 'application/json',
+            'X-M2M-RI': '12345',
+            'X-M2M-Origin': 'SOrigin',
+            'Content-Type': 'application/json; ty=4'
+        },
+        data: data
+    };
+
+    axios(config)
+        .then(function (response) {
+            // console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}

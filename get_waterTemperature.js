@@ -2,6 +2,7 @@
 const sensor = require('ds18b20-raspi');
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
+const axios = require('axios');
 
 let local_mqtt_client = null;
 
@@ -54,7 +55,7 @@ let sensingWaterTemperature = () => {
 
     if(local_mqtt_client) {
         local_mqtt_client.publish('/puleunair/hotwater', tempC.toString());
-            //TODO: cin 생성
+        crtci('PA1/hotwater', tempC.toString());
 
         arrHotwater.shift();
         arrHotwater.push(parseFloat(tempC));
@@ -65,3 +66,29 @@ let sensingWaterTemperature = () => {
 
 sensingWaterTemperature();
 
+function crtci(url, con) {
+    let data = {};
+    data["m2m:cin"] = {};
+    data["m2m:cin"].con = con;
+
+    let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'http://121.137.228.240:7579/Mobius/PureunAir/' + url,
+        headers: {
+            'Accept': 'application/json',
+            'X-M2M-RI': '12345',
+            'X-M2M-Origin': 'SOrigin',
+            'Content-Type': 'application/json; ty=4'
+        },
+        data: data
+    };
+
+    axios(config)
+        .then(function (response) {
+            // console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
