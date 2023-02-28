@@ -51,7 +51,8 @@ function local_mqtt_connect(serverip) {
 const SAMPLES = 3600;
 let arrTemperature = Array(SAMPLES).fill(0);
 let arrHumidity = Array(SAMPLES).fill(0);
-
+let preTemperature = 0;
+let preHumidity = 0;
 let sensingTempHumi = () => {
     sensor.read(22, 11, function (err, temperature, humidity) {
         if (!err) {
@@ -59,7 +60,6 @@ let sensingTempHumi = () => {
 
             if (local_mqtt_client) {
                 local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString()));
-
                 crtci('PA1/temphumi', temperature.toString() + ',' + humidity.toString());
 
                 arrTemperature.shift();
@@ -67,6 +67,21 @@ let sensingTempHumi = () => {
 
                 arrHumidity.shift();
                 arrHumidity.push(parseFloat(humidity));
+
+                preTemperature = parseFloat(temperature);
+                preHumidity = parseFloat(humidity);
+            }
+        }
+        else {
+            if (local_mqtt_client) {
+                local_mqtt_client.publish('/puleunair/temphumi', (preTemperature.toString() + ',' + preHumidity.toString()));
+                crtci('PA1/temphumi', preTemperature.toString() + ',' + preHumidity.toString());
+
+                arrTemperature.shift();
+                arrTemperature.push(parseFloat(preTemperature));
+
+                arrHumidity.shift();
+                arrHumidity.push(parseFloat(preHumidity));
             }
         }
 

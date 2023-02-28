@@ -48,6 +48,7 @@ function local_mqtt_connect(serverip) {
 
 const SAMPLES = 3600;
 let arrHotwater = Array(SAMPLES).fill(0);
+let preTempC = 0;
 
 let sensingWaterTemperature = () => {
     const tempC = sensor.readSimpleC(1);
@@ -60,8 +61,20 @@ let sensingWaterTemperature = () => {
 
             arrHotwater.shift();
             arrHotwater.push(parseFloat(tempC));
+
+            preTempC = parseFloat(tempC);
         }
     }
+    else {
+        if (local_mqtt_client) {
+            local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString());
+            crtci('PA1/hotwater', preTempC.toString());
+
+            arrHotwater.shift();
+            arrHotwater.push(parseFloat(preTempC));
+        }
+    }
+
 
     setTimeout(sensingWaterTemperature, 2000);
 }
