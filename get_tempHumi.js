@@ -60,7 +60,7 @@ let sensingTempHumi = () => {
 
             if(local_mqtt_client) {
                 local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString()+','+humidity.toString()));
-
+//TODO: cin 생성
                 arrTemperature.shift();
                 arrTemperature.push(parseFloat(temperature));
 

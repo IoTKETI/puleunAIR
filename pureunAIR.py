@@ -353,6 +353,8 @@ def on_message(client, userdata, _msg):
     global arrAutoFan
 #     global arrAutoHumidity
 #     global arrAutoTemperature
+    global hotwater
+    global humidity
 
     if _msg.topic == '/puleunair/hotwater':
         hotwater = float(_msg.payload.decode('utf-8'))

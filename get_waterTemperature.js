@@ -54,6 +54,7 @@ let sensingWaterTemperature = () => {
 
     if(local_mqtt_client) {
         local_mqtt_client.publish('/puleunair/hotwater', tempC.toString());
+            //TODO: cin 생성
 
         arrHotwater.shift();
         arrHotwater.push(parseFloat(tempC));
