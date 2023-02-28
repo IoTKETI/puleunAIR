@@ -53,7 +53,7 @@ let sensingWaterTemperature = () => {
     console.log('Water Temperature: ' + `${tempC} degC`);
 
     if(local_mqtt_client) {
-        local_mqtt_client.publish('/puleunair/hotwater', tempC);
+        local_mqtt_client.publish('/puleunair/hotwater', tempC.toString());
 
         arrHotwater.shift();
         arrHotwater.push(parseFloat(tempC));
