@@ -438,7 +438,7 @@ def auto():
 
         if AUTO_val["fan_period"] < float(humidity):
             set_Control4(1)
-        elif float(humidity) < (AUTO_val["fan_period"] - 5):
+        elif float(humidity) < (AUTO_val["fan_period"] - AUTO_val["fan_offset"]):
             set_Control4(0)
 
         spray_count += 1
@@ -459,7 +459,7 @@ def auto():
 
     if float(hotwater) < float(AUTO_val["heater_period"]):
         set_Control1(1)
-    elif float(AUTO_val["heater_period"]) + 0.4 < float(hotwater):
+    elif float(AUTO_val["heater_period"]) + AUTO_val["heater_offset"] < float(hotwater):
         set_Control1(0)
 
     if local_mqtt_client is not None:
@@ -538,6 +538,8 @@ if __name__ == "__main__":
         AUTO_val["ctrl3"] = 0
         AUTO_val["ctrl4"] = 0
         AUTO_val["ctrl5"] = 0
+        AUTO_val["heater_offset"] = 0.4
+        AUTO_val["fan_offset"] = 5.0
 
         with open('Profile.json', 'w') as outfile:
             json.dump(AUTO_val, outfile, indent=4)
@@ -575,5 +577,7 @@ if __name__ == "__main__":
                 air_count = 0
                 set_Control3(1)
                 auto_mode = True
+                with open('Profile.json', 'w') as outfile:
+                    json.dump(AUTO_val, outfile, indent=4)
             elif int(AUTO_val["auto"]) == 0:
                 auto_mode = False
