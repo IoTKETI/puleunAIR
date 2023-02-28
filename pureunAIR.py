@@ -544,6 +544,9 @@ if __name__ == "__main__":
         with open('Profile.json', 'w') as outfile:
             json.dump(AUTO_val, outfile, indent=4)
 
+    if int(AUTO_val["auto"]) == 1:
+        g_set_event |= SET_AUTO
+
     auto()
     #     sendStatus()
 
