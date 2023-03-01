@@ -1,4 +1,5 @@
-const sensor = require("node-dht-sensor");
+
+const sensor = require('ds18b20-raspi');
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
 const axios = require('axios');
@@ -28,15 +29,15 @@ function local_mqtt_connect(serverip) {
         local_mqtt_client.on('connect', () => {
             console.log('local_mqtt is connected to ( ' + serverip + ' )');
 
-            local_mqtt_client.subscribe('/pureunair/temphumi/param/set/interval');
+            local_mqtt_client.subscribe('/pureunair/hotwater/param/set/interval');
         });
 
         local_mqtt_client.on('message', (topic, message) => {
-            if (topic === '/pureunair/temphumi/param/set/interval') {
+            if (topic === '/pureunair/hotwater/param/set/interval') {
                 console.log(topic, message.tostring());
 
                 let interval = parseInt(message.toString());
-                sensingTempHumi(interval);
+                sensingHotwater(interval);
             }
         });
 
@@ -48,33 +49,32 @@ function local_mqtt_connect(serverip) {
     }
 }
 
-let preTemperature = 0;
-let preHumidity = 0;
+
+let preTempC = 0;
 let preCount = 0;
-let sensingTempHumi = (interval) => {
+let sensingHotwater = (interval) => {
     if(sensingTid) {
         clearInterval(sensingTid);
     }
 
     sensingTid = setInterval(() => {
-        sensor.read(22, 11, function (err, temperature, humidity) {
-            if (!err) {
-                console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
+        const tempC = sensor.readSimpleC(1);
+        if(tempC) {
+            console.log('Water Temperature: ' + `${tempC} degC`);
 
-                if (local_mqtt_client) {
-                    preCount = 0;
-                    local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString() + ',' + preCount.toString()));
-                }
+            if (local_mqtt_client) {
+                preCount = 0;
+                local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
             }
-            else {
-                if (local_mqtt_client) {
-                    preCount++;
-                    local_mqtt_client.publish('/puleunair/temphumi', (preTemperature.toString() + ',' + preHumidity.toString() + ',' + preCount.toString()));
-                }
+        }
+        else {
+            if (local_mqtt_client) {
+                preCount++;
+                local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
             }
-        });
+        }
     }, interval);
 }
 
 let sensingTid = null;
-sensingTempHumi(2000);
+sensingHotwater(2000);
