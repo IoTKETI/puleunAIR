@@ -78,4 +78,4 @@ let sensingHotwater = (interval) => {
 }
 
 let sensingTid = null;
-sensingHotwater(2000);
+sensingHotwater(3000);
