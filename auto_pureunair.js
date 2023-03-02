@@ -63,10 +63,18 @@ function local_mqtt_connect(serverip) {
                 let arrVal = message.toString().split(',');
                 curTemperature = parseFloat(arrVal[0]).toFixed(1);
                 curHumidity = parseFloat(arrVal[1]).toFixed(1);
+
+                if(parseFloat(arrVal[2]) > 0) {
+                    temphumi_error++;
+                }
             }
             else if (topic === '/puleunair/hotwater') {
                 let arrVal = message.toString().split(',');
                 curHotwater = parseFloat(arrVal[0]).toFixed(1);
+
+                if(parseFloat(arrVal[1]) > 0) {
+                    hotwater_error++;
+                }
             }
             else if (topic === '/puleunair/status') {
                 let objVal = JSON.parse(message.toString());
@@ -186,6 +194,9 @@ let spray_period = 1;
 let heater_offset = 0.2;
 let fan_offset = 3;
 
+let temphumi_error = 0;
+let hotwater_error = 0;
+
 const SAMPLES = 3600;
 let arrTemperature = Array(SAMPLES).fill(0);
 let arrHumidity = Array(SAMPLES).fill(0);
@@ -280,6 +291,8 @@ let sendStatus = () => {
         status.curTemperature = curTemperature;
         status.curHumidity = curHumidity;
         status.curHotwater = curHotwater;
+        status.hotwater_error = hotwater_error;
+        status.temphumi_error = temphumi_error;
 
         arrHotwater.shift();
         arrHotwater.push(parseFloat(curHotwater));
