@@ -4,6 +4,32 @@ const axios = require('axios');
 
 const pureunHost = 'gcs.iotocean.org';
 
+let crt_cin = (url, con) => {
+    let data = {};
+    data["m2m:cin"] = {};
+    data["m2m:cin"].con = con;
+
+    let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'http://'+pureunHost+':7579/Mobius/PureunAir/' + url,
+        headers: {
+            'Accept': 'application/json',
+            'X-M2M-RI': '12345',
+            'X-M2M-Origin': 'SOrigin',
+            'Content-Type': 'application/json; ty=4'
+        },
+        data: data
+    };
+
+    axios(config).then((response) => {
+        // console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+}
+
 let local_mqtt_client = null;
 function local_mqtt_connect(serverip) {
     if (local_mqtt_client === null) {
@@ -267,10 +293,9 @@ let sendStatus = () => {
 
         local_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
 
-        crtci("PureunAir/PA1/status", JSON.stringify(status))
+        crt_cin("PureunAir/PA1/status", JSON.stringify(status))
     }, 2000);
 }
-
 
 local_mqtt_connect('localhost');
 pureun_mqtt_connect(pureunHost);
@@ -283,30 +308,3 @@ setTimeout(()=>{
     sendStatus();
 }, 2000);
 
-
-function crtci(url, con) {
-    let data = {};
-    data["m2m:cin"] = {};
-    data["m2m:cin"].con = con;
-
-    let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'http://'+pureunHost+':7579/Mobius/PureunAir/' + url,
-        headers: {
-            'Accept': 'application/json',
-            'X-M2M-RI': '12345',
-            'X-M2M-Origin': 'SOrigin',
-            'Content-Type': 'application/json; ty=4'
-        },
-        data: data
-    };
-
-    axios(config)
-        .then(function (response) {
-            // console.log(JSON.stringify(response.data));
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-}
