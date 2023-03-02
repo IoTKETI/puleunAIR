@@ -275,39 +275,41 @@ let autoMonitor = () => {
 
 let status = {};
 let sendStatus = () => {
-    setInterval(() => {
-        status.auto = autoMode;
-        status.heater_period = heater_period;
-        status.spray_period = spray_period;
-        status.air_period = air_period;
-        status.fan_period = fan_period;
-        status.heater_offset = heater_offset;
-        status.fan_offset = fan_offset;
-        status.ctrlHeater = ctrlHeater;
-        status.ctrlAir = ctrlAir;
-        status.ctrlPump = ctrlPump;
-        status.ctrlFan = ctrlFan;
-        status.ctrlSpray = ctrlSpray;
-        status.curTemperature = curTemperature;
-        status.curHumidity = curHumidity;
-        status.curHotwater = curHotwater;
-        status.hotwater_error = hotwater_error;
-        status.temphumi_error = temphumi_error;
+    status.auto = autoMode;
+    status.heater_period = heater_period;
+    status.spray_period = spray_period;
+    status.air_period = air_period;
+    status.fan_period = fan_period;
+    status.heater_offset = heater_offset;
+    status.fan_offset = fan_offset;
+    status.ctrlHeater = ctrlHeater;
+    status.ctrlAir = ctrlAir;
+    status.ctrlPump = ctrlPump;
+    status.ctrlFan = ctrlFan;
+    status.ctrlSpray = ctrlSpray;
+    status.curTemperature = curTemperature;
+    status.curHumidity = curHumidity;
+    status.curHotwater = curHotwater;
+    status.hotwater_error = hotwater_error;
+    status.temphumi_error = temphumi_error;
 
-        arrHotwater.shift();
-        arrHotwater.push(parseFloat(curHotwater));
-        arrTemperature.shift();
-        arrTemperature.push(parseFloat(curTemperature));
-        arrHumidity.shift();
-        arrHumidity.push(parseFloat(curHumidity));
-        arrHeater.shift();
-        arrHeater.push(ctrlHeater);
-        arrFan.shift();
-        arrFan.push(ctrlFan);
+    arrHotwater.shift();
+    arrHotwater.push(parseFloat(curHotwater));
+    arrTemperature.shift();
+    arrTemperature.push(parseFloat(curTemperature));
+    arrHumidity.shift();
+    arrHumidity.push(parseFloat(curHumidity));
+    arrHeater.shift();
+    arrHeater.push(ctrlHeater);
+    arrFan.shift();
+    arrFan.push(ctrlFan);
 
-        pureun_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
+    pureun_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
 
-        crt_cin("PA1/status", JSON.stringify(status))
+    crt_cin("PA1/status", JSON.stringify(status));
+
+    setTimeout(()=>{
+        sendStatus();
     }, 2000);
 }
 
