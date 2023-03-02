@@ -294,7 +294,7 @@ let sendStatus = () => {
 
         local_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
 
-        crt_cin("PureunAir/PA1/status", JSON.stringify(status))
+        crt_cin("PA1/status", JSON.stringify(status))
     }, 2000);
 }
 
