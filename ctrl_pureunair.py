@@ -170,6 +170,7 @@ def on_message(client, userdata, _msg):
 STATUS_PERIOD = 2
 def sensingStatus():
     global STATUS_PERIOD
+    global g_set_event
 
     g_set_event |= SET_STATUS_PERIOD
 

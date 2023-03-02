@@ -1,3 +1,4 @@
+const fs = require("fs");
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
 const axios = require('axios');
