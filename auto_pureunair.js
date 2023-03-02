@@ -163,7 +163,7 @@ function pureun_mqtt_connect(serverip) {
         pureun_mqtt_client.on('error', (err) => {
             console.log('[local_mqtt] (error) ' + err.message);
             pureun_mqtt_client = null;
-            local_mqtt_connect(serverip);
+            pureun_mqtt_connect(serverip);
         });
     }
 }
@@ -292,7 +292,7 @@ let sendStatus = () => {
         arrFan.shift();
         arrFan.push(ctrlFan);
 
-        local_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
+        pureun_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
 
         crt_cin("PA1/status", JSON.stringify(status))
     }, 2000);
