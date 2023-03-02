@@ -64,6 +64,8 @@ let sensingTempHumi = (interval) => {
                 if (local_mqtt_client) {
                     preCount = 0;
                     local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString() + ',' + preCount.toString()));
+                    preTemperature = temperature;
+                    preHumidity = humidity;
                 }
             }
             else {

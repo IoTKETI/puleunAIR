@@ -65,6 +65,7 @@ let sensingHotwater = (interval) => {
             if (local_mqtt_client) {
                 preCount = 0;
                 local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
+                preTempC = tempC;
             }
         }
         else {
