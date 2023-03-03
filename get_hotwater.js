@@ -59,7 +59,7 @@ let sensingHotwater = (interval) => {
     sensingTid = setInterval(() => {
         sensor.readSimpleC(1, (err, tempC) => {
             if (!err) {
-                console.log('Water Temperature: ' + `${tempC} degC`);
+                console.log('Water Temperature: ' + `${tempC}°C`);
                 if (local_mqtt_client) {
                     preCount = 0;
                     local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
