@@ -66,7 +66,7 @@ let sensingHotwater = (interval, count) => {
     else {
         interval = 1000;
         count++;
-        if(count > 5) {
+        if(count > 9) {
             count = 0;
             interval = 3000;
             if (local_mqtt_client) {
