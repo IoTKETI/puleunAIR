@@ -54,6 +54,8 @@ let preCount = 0;
 let sensingHotwater = (interval, count) => {
     const tempC = sensor.readSimpleC(1);
     if(tempC) {
+        count = 0;
+        interval = 3000;
         console.log('Water Temperature: ' + `${tempC} degC`);
         if (local_mqtt_client) {
             preCount = 0;
