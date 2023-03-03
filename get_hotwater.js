@@ -2,7 +2,6 @@
 const sensor = require('ds18b20-raspi');
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
-const axios = require('axios');
 
 let local_mqtt_client = null;
 
@@ -58,24 +57,27 @@ let sensingHotwater = (interval) => {
     }
 
     sensingTid = setInterval(() => {
-        const tempC = sensor.readSimpleC(1);
-        if(tempC) {
-            console.log('Water Temperature: ' + `${tempC} degC`);
+        // round temperature reading to 1 digit
+        sensor.readSimpleC(1, (err, tempC) => {
+            if (err) {
+                console.log(err);
+                if (local_mqtt_client) {
+                    preCount++;
+                    local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
+                }
+            }
+            else {
+                console.log('Water Temperature: ' + `${tempC} degC`);
 
-            if (local_mqtt_client) {
-                preCount = 0;
-                local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
-                preTempC = tempC;
+                if (local_mqtt_client) {
+                    preCount = 0;
+                    local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
+                    preTempC = tempC;
+                }
             }
-        }
-        else {
-            if (local_mqtt_client) {
-                preCount++;
-                local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
-            }
-        }
+        });
     }, interval);
 }
 
 let sensingTid = null;
-sensingHotwater(4000);
+sensingHotwater(3000);
