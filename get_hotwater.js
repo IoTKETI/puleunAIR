@@ -51,34 +51,30 @@ function local_mqtt_connect(serverip) {
 
 let preTempC = 0;
 let preCount = 0;
-let sensingHotwater = (interval, count) => {
-    const tempC = sensor.readSimpleC(1);
-    if(tempC) {
-        count = 0;
-        interval = 3000;
-        console.log('Water Temperature: ' + `${tempC} degC`);
-        if (local_mqtt_client) {
-            preCount = 0;
-            local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
-            preTempC = tempC;
-        }
-    }
-    else {
-        interval = 1000;
-        count++;
-        if(count > 9) {
-            count = 0;
-            interval = 3000;
-            if (local_mqtt_client) {
-                preCount++;
-                local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
-            }
-        }
+let sensingHotwater = (interval) => {
+    if(sensingTid) {
+        clearInterval(sensingTid);
     }
 
-    setTimeout(sensingHotwater, interval, interval, count)
+    sensingTid = setInterval(() => {
+        sensor.readSimpleC(1, (err, tempC) => {
+            if (!err) {
+                console.log('Water Temperature: ' + `${tempC} degC`);
+                if (local_mqtt_client) {
+                    preCount = 0;
+                    local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
+                    preTempC = tempC;
+                }
+            }
+            else {
+                if (local_mqtt_client) {
+                    preCount++;
+                    local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
+                }
+            }
+        });
+    }, interval);
 }
 
 let sensingTid = null;
-let count = 0;
-sensingHotwater(3000, count);
+sensingHotwater(3000);

@@ -60,7 +60,6 @@ let sensingTempHumi = (interval) => {
         sensor.read(22, 11, function (err, temperature, humidity) {
             if (!err) {
                 console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
-
                 if (local_mqtt_client) {
                     preCount = 0;
                     local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString() + ',' + preCount.toString()));
