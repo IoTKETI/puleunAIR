@@ -62,9 +62,11 @@ let sensingHotwater = (interval, count) => {
         }
     }
     else {
+        interval = 500;
         count++;
-        if(count > 2) {
+        if(count > 5) {
             count = 0;
+            interval = 3000;
             if (local_mqtt_client) {
                 preCount++;
                 local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
@@ -77,4 +79,4 @@ let sensingHotwater = (interval, count) => {
 
 let sensingTid = null;
 let count = 0;
-sensingHotwater(1000, count);
+sensingHotwater(3000, count);
