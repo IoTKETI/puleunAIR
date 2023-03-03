@@ -64,7 +64,7 @@ let sensingHotwater = (interval, count) => {
         }
     }
     else {
-        interval = 500;
+        interval = 1000;
         count++;
         if(count > 5) {
             count = 0;
