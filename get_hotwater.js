@@ -51,33 +51,30 @@ function local_mqtt_connect(serverip) {
 
 let preTempC = 0;
 let preCount = 0;
-let sensingHotwater = (interval) => {
-    if(sensingTid) {
-        clearInterval(sensingTid);
+let sensingHotwater = (interval, count) => {
+    const tempC = sensor.readSimpleC(1);
+    if(tempC) {
+        console.log('Water Temperature: ' + `${tempC} degC`);
+        if (local_mqtt_client) {
+            preCount = 0;
+            local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
+            preTempC = tempC;
+        }
+    }
+    else {
+        count++;
+        if(count > 2) {
+            count = 0;
+            if (local_mqtt_client) {
+                preCount++;
+                local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
+            }
+        }
     }
 
-    sensingTid = setInterval(() => {
-        // round temperature reading to 1 digit
-        sensor.readSimpleC(1, (err, tempC) => {
-            if (err) {
-                console.log(err);
-                if (local_mqtt_client) {
-                    preCount++;
-                    local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
-                }
-            }
-            else {
-                console.log('Water Temperature: ' + `${tempC} degC`);
-
-                if (local_mqtt_client) {
-                    preCount = 0;
-                    local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
-                    preTempC = tempC;
-                }
-            }
-        });
-    }, interval);
+    setTimeout(sensingHotwater, interval, interval, count)
 }
 
 let sensingTid = null;
-sensingHotwater(3000);
+let count = 0;
+sensingHotwater(1000, count);
