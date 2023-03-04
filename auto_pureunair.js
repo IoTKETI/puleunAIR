@@ -119,6 +119,12 @@ function pureun_mqtt_connect(serverip) {
 
             pureun_mqtt_client.subscribe('/puleunair/auto/set');
 
+            pureun_mqtt_client.subscribe('/puleunair/Control_1/set');
+            pureun_mqtt_client.subscribe('/puleunair/Control_2/set');
+            pureun_mqtt_client.subscribe('/puleunair/Control_3/set');
+            pureun_mqtt_client.subscribe('/puleunair/Control_4/set');
+            pureun_mqtt_client.subscribe('/puleunair/Control_5/set');
+
             pureun_mqtt_client.subscribe('/puleunair/req/arrAutoTemperature');
             pureun_mqtt_client.subscribe('/puleunair/req/arrAutoHumidity');
             pureun_mqtt_client.subscribe('/puleunair/req/arrAutoHotwater');
@@ -150,6 +156,21 @@ function pureun_mqtt_connect(serverip) {
                     period.fan_offset = fan_offset;
                     fs.writeFileSync('Profile.json', JSON.stringify(period, null, 4), 'utf8');
                 }
+            }
+            else if (topic === '/puleunair/Control_5/set') {
+                local_mqtt_client.publish('/puleunair/Control_5/set', message.toString());
+            }
+            else if (topic === '/puleunair/Control_4/set') {
+                local_mqtt_client.publish('/puleunair/Control_4/set', message.toString());
+            }
+            else if (topic === '/puleunair/Control_3/set') {
+                local_mqtt_client.publish('/puleunair/Control_3/set', message.toString());
+            }
+            else if (topic === '/puleunair/Control_2/set') {
+                local_mqtt_client.publish('/puleunair/Control_2/set', message.toString());
+            }
+            else if (topic === '/puleunair/Control_1/set') {
+                local_mqtt_client.publish('/puleunair/Control_1/set', message.toString());
             }
             else if (topic === '/puleunair/req/arrAutoTemperature') {
                 pureun_mqtt_client.publish('/puleunair/res/arrAutoTemperature', JSON.stringify(arrTemperature));
