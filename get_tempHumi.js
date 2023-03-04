@@ -48,7 +48,7 @@ function local_mqtt_connect(serverip) {
     }
 }
 
-let sendHotwater = (err, tempC, callback) => {
+let sendHotwater = (err, tempC) => {
     if (!err) {
         console.log('Water Temperature: ' + `${tempC}°C`);
         if (local_mqtt_client) {
@@ -56,14 +56,12 @@ let sendHotwater = (err, tempC, callback) => {
             local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
             preTempC = tempC;
         }
-        callback();
     }
     else {
         if (local_mqtt_client) {
             preCount++;
             local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
         }
-        callback();
     }
 }
 
