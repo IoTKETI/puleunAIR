@@ -48,6 +48,46 @@ function local_mqtt_connect(serverip) {
     }
 }
 
+let sendHotwater = (err, tempC, callback) => {
+    if (!err) {
+        console.log('Water Temperature: ' + `${tempC}°C`);
+        if (local_mqtt_client) {
+            preCount = 0;
+            local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
+            preTempC = tempC;
+        }
+        callback();
+    }
+    else {
+        if (local_mqtt_client) {
+            preCount++;
+            local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
+        }
+        callback();
+    }
+}
+
+
+let sendTemphumi = (err, temperature, humidity, callback) => {
+    if (!err) {
+        console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
+        if (local_mqtt_client) {
+            preCount = 0;
+            local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString() + ',' + preCount.toString()));
+            preTemperature = temperature;
+            preHumidity = humidity;
+        }
+        callback();
+    }
+    else {
+        if (local_mqtt_client) {
+            preCount++;
+            local_mqtt_client.publish('/puleunair/temphumi', (preTemperature.toString() + ',' + preHumidity.toString() + ',' + preCount.toString()));
+        }
+        callback();
+    }
+}
+
 let preTemperature = 0;
 let preHumidity = 0;
 let preCount = 0;
@@ -59,55 +99,11 @@ let sensingTempHumi = (interval) => {
 
     sensingTid = setInterval(() => {
         sensor.read(22, 11, (err, temperature, humidity) => {
-            if (!err) {
-                console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
-                if (local_mqtt_client) {
-                    preCount = 0;
-                    local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString() + ',' + preCount.toString()));
-                    preTemperature = temperature;
-                    preHumidity = humidity;
-                }
-
+            sendTemphumi(err, temperature, humidity, () => {
                 sensor_ds18b20.readSimpleC(1, (err, tempC) => {
-                    if (!err) {
-                        console.log('Water Temperature: ' + `${tempC}°C`);
-                        if (local_mqtt_client) {
-                            preCount = 0;
-                            local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
-                            preTempC = tempC;
-                        }
-                    }
-                    else {
-                        if (local_mqtt_client) {
-                            preCount++;
-                            local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
-                        }
-                    }
+                    sendHotwater(err, tempC);
                 });
-            }
-            else {
-                if (local_mqtt_client) {
-                    preCount++;
-                    local_mqtt_client.publish('/puleunair/temphumi', (preTemperature.toString() + ',' + preHumidity.toString() + ',' + preCount.toString()));
-                }
-
-                sensor_ds18b20.readSimpleC(1, (err, tempC) => {
-                    if (!err) {
-                        console.log('Water Temperature: ' + `${tempC}°C`);
-                        if (local_mqtt_client) {
-                            preCount = 0;
-                            local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
-                            preTempC = tempC;
-                        }
-                    }
-                    else {
-                        if (local_mqtt_client) {
-                            preCount++;
-                            local_mqtt_client.publish('/puleunair/hotwater', preTempC.toString() + ',' + preCount.toString());
-                        }
-                    }
-                });
-            }
+            });
         });
     }, interval);
 }
