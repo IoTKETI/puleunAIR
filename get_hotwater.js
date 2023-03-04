@@ -1,5 +1,5 @@
 
-const sensor = require('ds18b20-raspi');
+const sensor_ds18b20 = require('ds18b20-raspi');
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
 
@@ -57,7 +57,7 @@ let sensingHotwater = (interval) => {
     }
 
     sensingTid = setInterval(() => {
-        sensor.readSimpleC(1, (err, tempC) => {
+        sensor_ds18b20.readSimpleC(1, (err, tempC) => {
             if (!err) {
                 console.log('Water Temperature: ' + `${tempC}°C`);
                 if (local_mqtt_client) {
