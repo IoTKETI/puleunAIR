@@ -176,6 +176,10 @@ def sensingStatus():
 
     threading.Timer(STATUS_PERIOD, sensingStatus).start()
 
+def sendStatus():
+    if local_mqtt_client is not None:
+        local_mqtt_client.publish(pub_status_topic, json.dumps(STATUS_val))
+
 if __name__ == "__main__":
     local_mqtt_client = mqtt.Client()
     local_mqtt_client.on_connect = on_connect
@@ -204,8 +208,9 @@ if __name__ == "__main__":
     set_Control4(0)
     set_Control5(0)
 
-    sensingStatus()
+#     sensingStatus()
 
+    sendCount = 0
     while True:
         if g_set_event & SET_Control1:
             g_set_event &= (~SET_Control1)
@@ -222,8 +227,15 @@ if __name__ == "__main__":
         elif g_set_event & SET_Control5:
             g_set_event &= (~SET_Control5)
             set_Control5(Control5_val)
-        elif g_set_event & SET_STATUS_PERIOD:
-            g_set_event &= (~SET_STATUS_PERIOD)
-            if local_mqtt_client is not None:
-                local_mqtt_client.publish(pub_status_topic, json.dumps(STATUS_val))
+
+        sendCount += 1
+        sendCount %= 10000
+
+        if(sendCount == 0):
+            sendStatus()
+
+#         elif g_set_event & SET_STATUS_PERIOD:
+#             g_set_event &= (~SET_STATUS_PERIOD)
+#             if local_mqtt_client is not None:
+#                 local_mqtt_client.publish(pub_status_topic, json.dumps(STATUS_val))
 
