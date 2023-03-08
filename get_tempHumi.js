@@ -48,8 +48,8 @@ function local_mqtt_connect(serverip) {
     }
 }
 
-let sendHotwater = (err, tempC) => {
-    if (!err) {
+let sendHotwater = (tempC) => {
+    if (!tempC) {
         console.log('Water Temperature: ' + `${tempC}°C`);
         if (local_mqtt_client) {
             preCount = 0;
@@ -98,9 +98,8 @@ let sensingTempHumi = (interval) => {
     sensingTid = setInterval(() => {
         sensor.read(22, 11, (err, temperature, humidity) => {
             sendTemphumi(err, temperature, humidity, () => {
-                sensor_ds18b20.readSimpleC(1, (err, tempC) => {
-                    sendHotwater(err, tempC);
-                });
+                const tempC = sensor.readSimpleC(1);
+                sendHotwater(tempC);
             });
         });
     }, interval);
