@@ -98,7 +98,7 @@ let sensingTempHumi = (interval) => {
     sensingTid = setInterval(() => {
         sensor.read(22, 11, (err, temperature, humidity) => {
             sendTemphumi(err, temperature, humidity, () => {
-                const tempC = sensor.readSimpleC(1);
+                const tempC = sensor_ds18b20.readSimpleC(1);
                 sendHotwater(tempC);
             });
         });
