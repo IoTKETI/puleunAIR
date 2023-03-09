@@ -306,6 +306,7 @@ let sendStatus = () => {
     status.heater_period = heater_period;
     status.spray_period = spray_period;
     status.air_period = air_period;
+    status.air_h_period = air_h_period;
     status.fan_period = fan_period;
     status.heater_offset = heater_offset;
     status.fan_offset = fan_offset;
