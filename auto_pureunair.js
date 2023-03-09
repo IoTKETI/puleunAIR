@@ -261,24 +261,24 @@ let autoMonitor = () => {
 
         if(autoMode === 1) {
             if(parseFloat(curHumidity) > parseFloat(fan_period)) {
-                local_mqtt_client.publish('/puleunair/Control_4/set', '1');
+                local_mqtt_client.publish('/puleunair/Control_2/set', '1');
             }
             else if(parseFloat(curHumidity) < (parseFloat(fan_period) - parseFloat(fan_offset))) {
-                local_mqtt_client.publish('/puleunair/Control_4/set', '0');
+                local_mqtt_client.publish('/puleunair/Control_2/set', '0');
             }
+
+            local_mqtt_client.publish('/puleunair/Control_3/set', '1');
 
             air_count++;
             if (0 <= air_count && air_count < (parseInt(air_period) * 60)) {
-                local_mqtt_client.publish('/puleunair/Control_2/set', '1');
+                local_mqtt_client.publish('/puleunair/Control_4/set', '1');
             }
             else if ((parseInt(air_period) * 60) <= air_count && air_count < (60 * 60)) {
-                local_mqtt_client.publish('/puleunair/Control_2/set', '0');
+                local_mqtt_client.publish('/puleunair/Control_4/set', '0');
             }
             else {
                 air_count = 0;
             }
-
-            local_mqtt_client.publish('/puleunair/Control_3/set', '1');
 
             spray_count++;
             if (0 <= spray_count && spray_count < (parseInt(spray_period) * 60)) {
