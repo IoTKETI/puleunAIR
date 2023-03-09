@@ -138,6 +138,7 @@ function pureun_mqtt_connect(serverip) {
                 autoMode = objVal.auto;
                 heater_period = objVal.heater_period;
                 air_period = objVal.air_period;
+                air_h_period = objVal.air_h_period;
                 fan_period = objVal.fan_period;
                 spray_period = objVal.spray_period;
                 heater_offset = objVal.heater_offset;
@@ -150,6 +151,7 @@ function pureun_mqtt_connect(serverip) {
                     period.auto = autoMode;
                     period.heater_period = heater_period;
                     period.air_period = air_period;
+                    period.air_h_period = air_h_period;
                     period.fan_period = fan_period;
                     period.spray_period = spray_period;
                     period.heater_offset = heater_offset;
@@ -210,6 +212,7 @@ let ctrlSpray = 0;
 let autoMode = 0;
 let heater_period = 22.0;
 let air_period = 5;
+let air_h_period = 2;
 let fan_period = 70.0;
 let spray_period = 1;
 let heater_offset = 0.2;
@@ -234,6 +237,7 @@ try {
     autoMode = period.auto;
     heater_period = period.heater_period;
     air_period = period.air_period;
+    air_h_period = period.air_h_period;
     fan_period = period.fan_period;
     spray_period = period.spray_period;
     heater_offset = period.heater_offset;
@@ -244,6 +248,7 @@ catch (e) {
     period.heater_period = heater_period;
     period.spray_period = spray_period;
     period.air_period = air_period;
+    period.air_h_period = air_h_period;
     period.fan_period = fan_period;
     period.heater_offset = heater_offset;
     period.fan_offset = fan_offset;
@@ -273,23 +278,24 @@ let autoMonitor = () => {
             if (0 <= air_count && air_count < (parseInt(air_period) * 60)) {
                 local_mqtt_client.publish('/puleunair/Control_4/set', '1');
             }
-            else if ((parseInt(air_period) * 60) <= air_count && air_count < (60 * 60)) {
+            else if ((parseInt(air_period) * 60) <= air_count && air_count < (parseInt(air_h_period) * 60 * 60)) {
                 local_mqtt_client.publish('/puleunair/Control_4/set', '0');
             }
             else {
                 air_count = 0;
             }
 
-            spray_count++;
-            if (0 <= spray_count && spray_count < (parseInt(spray_period) * 60)) {
-                local_mqtt_client.publish('/puleunair/Control_5/set', '1');
-            }
-            else if ((parseInt(spray_period) * 60) <= spray_count && spray_count < (60 * 60)) {
-                local_mqtt_client.publish('/puleunair/Control_5/set', '0');
-            }
-            else {
-                spray_count = 0;
-            }
+            // 임시 삭제
+            // spray_count++;
+            // if (0 <= spray_count && spray_count < (parseInt(spray_period) * 60)) {
+            //     local_mqtt_client.publish('/puleunair/Control_5/set', '1');
+            // }
+            // else if ((parseInt(spray_period) * 60) <= spray_count && spray_count < (60 * 60)) {
+            //     local_mqtt_client.publish('/puleunair/Control_5/set', '0');
+            // }
+            // else {
+            //     spray_count = 0;
+            // }
         }
     }, 1000);
 }
