@@ -329,7 +329,7 @@ let sendStatus = () => {
     arrHeater.shift();
     arrHeater.push(ctrlHeater);
     arrFan.shift();
-    arrFan.push(ctrlFan);
+    arrFan.push(ctrlAir);
 
     pureun_mqtt_client.publish('/puleunair/status', JSON.stringify(status));
 
