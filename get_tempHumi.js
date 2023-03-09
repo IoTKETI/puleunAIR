@@ -104,4 +104,4 @@ let sensingTempHumi = (interval) => {
 }
 
 let sensingTid = null;
-sensingTempHumi(3000);
+sensingTempHumi(4000);
