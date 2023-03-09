@@ -265,10 +265,10 @@ let autoMonitor = () => {
         }
 
         if(autoMode === 1) {
-            if(parseFloat(curHumidity) > parseFloat(fan_period)) {
+            if(parseFloat(curHumidity) < parseFloat(fan_period)) {
                 local_mqtt_client.publish('/puleunair/Control_2/set', '1');
             }
-            else if(parseFloat(curHumidity) < (parseFloat(fan_period) - parseFloat(fan_offset))) {
+            else if(parseFloat(curHumidity) > (parseFloat(fan_period) + parseFloat(fan_offset))) {
                 local_mqtt_client.publish('/puleunair/Control_2/set', '0');
             }
 
