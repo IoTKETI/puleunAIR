@@ -257,14 +257,21 @@ catch (e) {
 
 let autoMonitor = () => {
     setInterval(() => {
-        if(parseFloat(curHotwater) < parseFloat(heater_period)) {
-            local_mqtt_client.publish('/puleunair/Control_1/set', '1');
-        }
-        else if(parseFloat(curHotwater) > (parseFloat(heater_period) + parseFloat(heater_offset))) {
-            local_mqtt_client.publish('/puleunair/Control_1/set', '0');
-        }
+        // if(parseFloat(curHotwater) < parseFloat(heater_period)) {
+        //     local_mqtt_client.publish('/puleunair/Control_1/set', '1');
+        // }
+        // else if(parseFloat(curHotwater) > (parseFloat(heater_period) + parseFloat(heater_offset))) {
+        //     local_mqtt_client.publish('/puleunair/Control_1/set', '0');
+        // }
 
         if(autoMode === 1) {
+            if(parseFloat(curHotwater) < parseFloat(heater_period)) {
+                local_mqtt_client.publish('/puleunair/Control_1/set', '1');
+            }
+            else if(parseFloat(curHotwater) > (parseFloat(heater_period) + parseFloat(heater_offset))) {
+                local_mqtt_client.publish('/puleunair/Control_1/set', '0');
+            }
+
             if(parseFloat(curHumidity) < parseFloat(fan_period)) {
                 local_mqtt_client.publish('/puleunair/Control_2/set', '1');
             }
