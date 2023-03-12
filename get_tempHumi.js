@@ -2,6 +2,7 @@ const sensor = require("node-dht-sensor");
 const sensor_ds18b20 = require('ds18b20-raspi');
 const {nanoid} = require("nanoid");
 const mqtt = require("mqtt");
+const moment = require("moment");
 
 let local_mqtt_client = null;
 
@@ -50,7 +51,7 @@ function local_mqtt_connect(serverip) {
 
 let sendHotwater = (tempC) => {
     if (tempC !== null) {
-        console.log('Water Temperature: ' + `${tempC}°C`);
+        console.log('[' + moment().format('YYYY-MM-DD hh:mm:ssSSS') + '] ' + 'Water Temperature: ' + `${tempC}°C`);
         if (local_mqtt_client) {
             preCount = 0;
             local_mqtt_client.publish('/puleunair/hotwater', tempC.toString() + ',' + preCount.toString());
@@ -67,7 +68,7 @@ let sendHotwater = (tempC) => {
 
 let sendTemphumi = (err, temperature, humidity, callback) => {
     if (!err) {
-        console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
+        console.log('[' + moment().format('YYYY-MM-DD hh:mm:ssSSS') + '] ' + `temp: ${temperature}°C, humidity: ${humidity}%`);
         if (local_mqtt_client) {
             preCount = 0;
             local_mqtt_client.publish('/puleunair/temphumi', (temperature.toString() + ',' + humidity.toString() + ',' + preCount.toString()));
