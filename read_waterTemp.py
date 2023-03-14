@@ -42,8 +42,6 @@ def read_hotwater():
         mqtt_client.reconnect()
         mqtt_client.publish(pub_hotwater_topic, temperature)
 
-    crt_cin("PureunAir/PA1/hotwater", temperature)
-
     print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f') + " Water Temperature:%s C" % temperature)
 
     threading.Timer(3, read_hotwater).start()
