@@ -21,9 +21,7 @@ def read_temphumi():
     else:
         mqtt_client.reconnect()
 
-    print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'))
-    print("Relative Humidity : %.2f %%" % (result['h']))
-    print("Temperature in Celsius : %.2f C" % (result['c']))
+    print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')+" Relative Humidity : %.2f %%" + " Temperature in Celsius : %.2f C" % (result['h'], result['c']))
 
     threading.Timer(3, read_temphumi).start()
 

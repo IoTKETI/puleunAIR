@@ -21,8 +21,7 @@ def read_hotwater():
     else:
         mqtt_client.reconnect()
 
-    print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'))
-    print("Water Temperature:%s C" % temp)
+    print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f') + " Water Temperature:%s C" % temp)
 
     threading.Timer(3, read_hotwater).start()
 
