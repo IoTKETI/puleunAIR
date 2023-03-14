@@ -22,9 +22,9 @@ class DFRobot_MAX31855:
     '''
 
     def __init__(self, bus, addr):
-        self.__addr = addr
+        self.__addr = 0x10
         self.i2cbus = smbus.SMBus(bus)
-        print('DFRobot_MAX31855 I2C - bus:', bus, ' addr:', self.__addr)
+        # print('DFRobot_MAX31855 I2C - bus:', bus, ' addr:', self.__addr)
 
     def read_celsius(self):
         '''
@@ -32,7 +32,7 @@ class DFRobot_MAX31855:
           @return Temperature value
         '''
         rxbuf = self.read_data(0x00, 4)
-        print('rxbuf: ', rxbuf)
+        # print('rxbuf: ', rxbuf)
         if (rxbuf[3] & 0x7):
             return -1
         if (rxbuf[0] & 0x80):
