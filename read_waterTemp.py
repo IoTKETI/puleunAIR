@@ -41,10 +41,10 @@ def read_hotwater():
         preCount += 1
         temperature = pre_result
     if mqtt_client is not None:
-        mqtt_client.publish(pub_hotwater_topic, temperature+','+preCount)
+        mqtt_client.publish(pub_hotwater_topic, temperature + ',' + str(preCount))
     else:
         mqtt_client.reconnect()
-        mqtt_client.publish(pub_hotwater_topic, temperature+','+preCount)
+        mqtt_client.publish(pub_hotwater_topic, temperature + ',' + str(preCount))
 
     print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f') + " Water Temperature:%s C" % temperature)
 
