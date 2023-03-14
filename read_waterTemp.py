@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
 from DFRobot_MAX31855 import *
 import paho.mqtt.client as mqtt
 import threading
@@ -8,8 +11,8 @@ pureunHost = '121.137.228.240'
 mqtt_client = None
 pub_hotwater_topic = "/puleunair/hotwater"
 
-I2C_BUS = 4
-I2C_ADDRESS = 10
+I2C_BUS = 0x04
+I2C_ADDRESS = 0x10
 
 max31855 = DFRobot_MAX31855(I2C_BUS, I2C_ADDRESS)
 

@@ -32,6 +32,7 @@ class DFRobot_MAX31855:
           @return Temperature value
         '''
         rxbuf = self.read_data(0x00, 4)
+        print('rxbuf: ', rxbuf)
         if (rxbuf[3] & 0x7):
             return -1
         if (rxbuf[0] & 0x80):
