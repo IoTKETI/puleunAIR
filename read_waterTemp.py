@@ -98,7 +98,7 @@ if __name__ == "__main__":
     mqtt_client.on_disconnect = on_disconnect
     mqtt_client.on_subscribe = on_subscribe
     mqtt_client.on_message = on_message
-    mqtt_client.connect("121.137.228.240", 1883)
+    mqtt_client.connect(pureunHost, 1883)
 
     mqtt_client.loop_start()
 
