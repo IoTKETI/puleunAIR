@@ -1,15 +1,13 @@
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from DFRobot_MAX31855 import *
 import paho.mqtt.client as mqtt
 import threading
 from datetime import datetime
-import requests
-import json
 
-pureunHost = '121.137.228.240'
+pureunHost = '127.0.0.1'
 
 mqtt_client = None
 pub_hotwater_topic = "/puleunair/hotwater"
@@ -94,27 +92,6 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, _msg):
     print("Received " + _msg.payload.decode('utf-8') + " From " + _msg.topic)
-
-
-def crt_cin(url, con):
-    global pureunHost
-
-    url = "http://" + pureunHost + ":7579/Mobius/" + url
-
-    payload = dict()
-    payload["m2m:cin"] = dict()
-    payload["m2m:cin"]["con"] = con
-
-    headers = {
-        'Accept': 'application/json',
-        'X-M2M-RI': '12345',
-        'X-M2M-Origin': 'Spureunair',
-        'Content-Type': 'application/json; ty=4'
-    }
-
-    response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
-
-    # print(response.headers['X-M2M-RSC'], '-', response.text)
 
 
 if __name__ == "__main__":
