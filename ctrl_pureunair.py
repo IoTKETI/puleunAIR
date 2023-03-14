@@ -38,7 +38,7 @@ Control4_pin = 13
 Control5_pin = 14
 
 i2c_addr = 0x3e
-i2c_bus = 5
+i2c_bus = 7
 sx = SX1509.SX1509(i2c_addr, i2c_bus)
 ctl = Control.Control(sx)
 
@@ -231,7 +231,7 @@ if __name__ == "__main__":
         sendCount += 1
         sendCount %= 10000
 
-        if(sendCount == 0):
+        if sendCount == 0:
             sendStatus()
 
 #         elif g_set_event & SET_STATUS_PERIOD:

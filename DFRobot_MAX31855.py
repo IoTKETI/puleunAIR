@@ -24,7 +24,7 @@ class DFRobot_MAX31855:
     def __init__(self, bus, addr):
         self.__addr = addr
         self.i2cbus = smbus.SMBus(bus)
-        print('DFRobot_MAX31855 I2C - bus:', bus, ' addr:',self.__addr)
+        print('DFRobot_MAX31855 I2C - bus:', bus, ' addr:', self.__addr)
 
     def read_celsius(self):
         '''

@@ -2,7 +2,7 @@ import smbus
 import time
 
 # Get I2C bus
-bus = smbus.SMBus(3)
+bus = smbus.SMBus(5)
 
 # I2C address of the device
 SHT31_DEFAULT_ADDRESS = 0x44
