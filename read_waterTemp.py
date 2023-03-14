@@ -30,7 +30,7 @@ def read_hotwater():
 
     try:
         temp = max31855.read_celsius()
-        if temp < 0:
+        if temp > 0:
             preCount = 0
             pre_result = temp
             temperature = temp
