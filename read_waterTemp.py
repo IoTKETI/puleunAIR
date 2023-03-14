@@ -8,7 +8,7 @@ pureunHost = '121.137.228.240'
 mqtt_client = None
 pub_hotwater_topic = "/puleunair/hotwater"
 
-I2C_1 = 0x01
+I2C_1 = 0x04
 I2C_ADDRESS = 0x10
 
 max31855 = DFRobot_MAX31855(I2C_1, I2C_ADDRESS)
