@@ -115,7 +115,7 @@ function pureun_mqtt_connect(serverip) {
         pureun_mqtt_client = mqtt.connect(connectOptions);
 
         pureun_mqtt_client.on('connect', () => {
-            console.log('local_mqtt is connected to ( ' + serverip + ' )');
+            console.log('pureun_mqtt is connected to ( ' + serverip + ' )');
 
             pureun_mqtt_client.subscribe('/puleunair/auto/set');
 
@@ -348,7 +348,7 @@ let sendStatus = () => {
     }, 2000);
 }
 
-local_mqtt_connect('localhost');
+local_mqtt_connect('127.0.0.1');
 pureun_mqtt_connect(pureunHost);
 
 setTimeout(()=>{
