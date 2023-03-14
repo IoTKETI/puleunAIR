@@ -9,12 +9,16 @@ mqtt_client = None
 pub_hotwater_topic = "/puleunair/hotwater"
 
 I2C_BUS = 4
-I2C_ADDRESS = 0x10
+I2C_ADDRESS = 10
 
 max31855 = DFRobot_MAX31855(I2C_BUS, I2C_ADDRESS)
 
 
 def read_hotwater():
+    global max31855
+    global mqtt_client
+    global pub_hotwater_topic
+
     temp = max31855.read_celsius()
     if mqtt_client is not None:
         mqtt_client.publish(pub_hotwater_topic, temp)

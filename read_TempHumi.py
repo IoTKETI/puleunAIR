@@ -13,6 +13,10 @@ sht31 = SHT31()
 
 
 def read_temphumi():
+    global sht31
+    global mqtt_client
+    global pub_temphumi_topic
+
     sht31.write_command()
     time.sleep(0.3)
     result = sht31.read_data()
