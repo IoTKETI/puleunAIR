@@ -30,7 +30,7 @@ def read_hotwater():
 
     print('\n', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f') + " Water Temperature:%s C" % temp)
 
-    threading.Timer(3, read_hotwater).start()
+    threading.Timer(1, read_hotwater).start()
 
 
 def on_connect(client, userdata, flags, rc):

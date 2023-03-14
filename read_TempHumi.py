@@ -29,7 +29,7 @@ def read_temphumi():
         '%Y-%m-%d %H:%M:%S.%f') + " Relative Humidity: {0:0.2f} %% Temperature in Celsius: {1:0.2f} C".format(
         result['h'], result['c']))
 
-    threading.Timer(3, read_temphumi).start()
+    threading.Timer(1, read_temphumi).start()
 
 
 def on_connect(client, userdata, flags, rc):
