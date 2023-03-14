@@ -42,6 +42,7 @@ i2c_bus = 7
 sx = SX1509.SX1509(i2c_addr, i2c_bus)
 ctl = Control.Control(sx)
 
+
 def set_Control1(val):
     global STATUS_val
 
@@ -168,6 +169,8 @@ def on_message(client, userdata, _msg):
 
 
 STATUS_PERIOD = 2
+
+
 def sensingStatus():
     global STATUS_PERIOD
     global g_set_event
@@ -176,9 +179,11 @@ def sensingStatus():
 
     threading.Timer(STATUS_PERIOD, sensingStatus).start()
 
+
 def sendStatus():
     if local_mqtt_client is not None:
         local_mqtt_client.publish(pub_status_topic, json.dumps(STATUS_val))
+
 
 if __name__ == "__main__":
     local_mqtt_client = mqtt.Client()
@@ -208,7 +213,7 @@ if __name__ == "__main__":
     set_Control4(0)
     set_Control5(0)
 
-#     sensingStatus()
+    #     sensingStatus()
 
     sendCount = 0
     while True:
@@ -238,4 +243,3 @@ if __name__ == "__main__":
 #             g_set_event &= (~SET_STATUS_PERIOD)
 #             if local_mqtt_client is not None:
 #                 local_mqtt_client.publish(pub_status_topic, json.dumps(STATUS_val))
-
