@@ -17,7 +17,7 @@ def read_temphumi():
     time.sleep(0.3)
     result = sht31.read_data()
     if mqtt_client is not None:
-        mqtt_client.publish(pub_temphumi_topic, result['c'] + ',' + result['h'])
+        mqtt_client.publish(pub_temphumi_topic, str(result['c']) + ',' + str(result['h']))
     else:
         mqtt_client.reconnect()
 
