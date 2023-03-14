@@ -39,21 +39,21 @@ def on_connect(client, userdata, flags, rc):
     global mqtt_client
     global pureunHost
 
-    if rc is 0:
+    if rc == 0:
         print('[mqtt_client_connect] connect to ' + pureunHost)
-    elif rc is 1:
+    elif rc == 1:
         print("incorrect protocol version")
         mqtt_client.reconnect()
-    elif rc is 2:
+    elif rc == 2:
         print("invalid client identifier")
         mqtt_client.reconnect()
-    elif rc is 3:
+    elif rc == 3:
         print("server unavailable")
         mqtt_client.reconnect()
-    elif rc is 4:
+    elif rc == 4:
         print("bad username or password")
         mqtt_client.reconnect()
-    elif rc is 5:
+    elif rc == 5:
         print("not authorised")
         mqtt_client.reconnect()
     else:
