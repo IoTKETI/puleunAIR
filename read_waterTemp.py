@@ -35,7 +35,6 @@ def read_hotwater():
             pre_result = temp
             temperature = temp
         else:
-            preCount += 1
             temperature = pre_result
     except Exception as e:
         preCount += 1
