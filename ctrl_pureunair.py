@@ -31,11 +31,11 @@ Control4_val = 0
 Control5_val = 0
 STATUS_val = dict()
 
-Control1_pin = 10
-Control2_pin = 11
-Control3_pin = 12
-Control4_pin = 13
-Control5_pin = 14
+Control1_pin = 5
+Control2_pin = 6
+Control3_pin = 7
+Control4_pin = 8
+Control5_pin = 9
 
 i2c_addr = 0x3e
 i2c_bus = 7
