@@ -145,8 +145,8 @@ function pureun_mqtt_connect(serverip) {
                 fan_offset = objVal.fan_offset;
 
                 if(autoMode) {
-                    air_count = 0;
-                    spray_count = 0;
+                    // air_count = 0;
+                    // spray_count = 0;
 
                     period.auto = autoMode;
                     period.heater_period = heater_period;
